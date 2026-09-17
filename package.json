@@ -1,0 +1,16 @@
+{
+  "name": "cercatv-web",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "deploy": "./deploy.sh"
+  },
+  "dependencies": {
+    "astro": "latest"
+  }
+}

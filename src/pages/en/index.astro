@@ -1,0 +1,147 @@
+---
+import '../../styles/global.css';
+import '../../styles/tokens.css';
+import '../../styles/header.css';
+import '../../styles/footer.css';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// Dominio de pruebas actual; confirmar dominio definitivo antes de quitar el noindex.
+const siteOrigin = 'https://publicidadsegmentadatv.com';
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: '+CercaTV',
+  url: `${siteOrigin}${base}/en/`,
+  logo: `${siteOrigin}${base}/images/brand/cercatv-logo-color.svg`,
+  description: 'Hyperlocal TV advertising on Atresmedia channels, targeted by postcode, neighbourhood or city.',
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script is:inline>
+      (function () {
+        if (sessionStorage.getItem('cercatv-auth') === '1') return;
+        let ok = false;
+        while (!ok) {
+          const u = prompt('Usuario');
+          const p = prompt('Contraseña');
+          if (u === 'Cidoncha' && p === '007007') { sessionStorage.setItem('cercatv-auth', '1'); ok = true; }
+        }
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="Hyperlocal TV advertising on Atresmedia channels. Reach the postcodes, neighbourhoods and cities that matter to your business." />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="preload" href={`${base}/fonts/gothampro-regular.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={`${base}/fonts/gothampro-bold.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="alternate" hreflang="es" href={`${siteOrigin}${base}/`} />
+    <link rel="alternate" hreflang="en" href={`${siteOrigin}${base}/en/`} />
+    <link rel="alternate" hreflang="ca" href={`${siteOrigin}${base}/ca/`} />
+    <title>Hyperlocal TV advertising | +CercaTV</title>
+    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+  </head>
+  <body>
+    <Header locale="en" />
+    <main>
+      <section class="hero" id="overview" data-i18n-section="overview">
+        <div class="hero__content">
+          <div class="eyebrow">Hyperlocal television · on Atresmedia channels</div>
+          <h1><span>Make TV advertising work</span><span>where it drives business</span></h1>
+          <p>Reach the postcodes, neighbourhoods or cities that matter to you. No need to produce a TV commercial.</p>
+          <div class="hero__actions">
+            <a class="hero__primary-action" href="#contact">Discuss my campaign</a>
+            <a class="hero__secondary-action" href="#process">See how it works <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <div class="hero__signal" aria-hidden="true"><span></span><span></span><span></span></div>
+      </section>
+
+      <section class="benefits" id="benefits" aria-labelledby="benefits-title" data-i18n-section="benefits" data-reveal>
+        <h2 id="benefits-title">Why are more and more brands using hyperlocal television?</h2>
+        <div class="benefits__grid">
+          <article class="benefit"><div class="benefit__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></div><h3>Reach people where you are most likely to sell</h3><p>Don't waste investment in areas where your business does not operate.</p></article>
+          <article class="benefit"><div class="benefit__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3z"/><path d="m8.5 12 2.2 2.2 4.8-4.8"/></svg></div><h3>The credibility of television</h3><p>With the precision and measurement of digital marketing.</p></article>
+          <article class="benefit"><div class="benefit__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="13" rx="2"/><path d="m9 21 3-3 3 3M8 9l3 2 5-3"/></svg></div><h3>More people, more attention</h3><p>On the main screen in the home, with real impact.</p></article>
+        </div>
+      </section>
+
+      <section class="power" id="atresmedia" aria-labelledby="power-title" data-i18n-section="atresmedia" data-reveal>
+        <div class="power__intro"><span class="eyebrow">Atresmedia</span><h2 id="power-title">The power of Atresmedia.<br /><em>The precision of digital marketing.</em></h2></div>
+        <div class="power__stats"><article class="power-stat"><strong>27M</strong><span>Audience</span></article><article class="power-stat"><strong>Prime</strong><span>Premium environment</span></article><article class="power-stat"><strong>100%</strong><span>Brand safety</span></article><article class="power-stat"><strong>No. 1 TV</strong><span>Authority</span></article></div>
+      </section>
+
+      <section class="cases" id="cases" aria-labelledby="cases-title" data-i18n-section="cases" data-reveal>
+        <div class="cases__heading"><span class="eyebrow">Real stories</span><h2 id="cases-title">Success stories</h2></div>
+        <div class="cases__grid">
+          <article class="case-card"><div class="case-card__top"><span>Clinics</span><strong data-prefix="+" data-value="38" data-suffix="%">+38%</strong></div><div class="case-card__body"><h3>Clínica Norte</h3><p>Appointments in 6 weeks · North Madrid</p></div></article>
+          <article class="case-card"><div class="case-card__top"><span>Automotive</span><strong data-prefix="×" data-value="2.7" data-decimals="1">×2.7</strong></div><div class="case-card__body"><h3>Auto Ibérica</h3><p>Qualified leads · Levante</p></div></article>
+          <article class="case-card"><div class="case-card__top"><span>Restaurants</span><strong data-prefix="+" data-value="27" data-suffix="%">+27%</strong></div><div class="case-card__body"><h3>Panadería 1908</h3><p>In-store traffic · 4 neighbourhoods</p></div></article>
+        </div>
+        <div class="cases__footer"><a class="cta-pill" href={`${base}/casos-de-exito`}>See all success stories</a></div>
+      </section>
+
+      <section class="process" id="process" aria-labelledby="process-title" data-i18n-section="process" data-reveal>
+        <div class="process__intro"><span class="eyebrow">The process</span><h2 id="process-title">It's that simple</h2></div>
+        <ol class="process__list">
+          <li class="process-step"><span>01</span><div><h3>We choose the area</h3><p>Postcodes, neighbourhoods or cities.</p></div></li>
+          <li class="process-step"><span>02</span><div><h3>We define the audience</h3><p>Profile, habits and viewing moment.</p></div></li>
+          <li class="process-step"><span>03</span><div><h3>We create the campaign</h3><p>TV-specific creative.</p></div></li>
+          <li class="process-step"><span>04</span><div><h3>We activate it</h3><p>On Atresmedia channels. Within 72 hours.</p></div></li>
+          <li class="process-step"><span>05</span><div><h3>We measure results</h3><p>Business KPIs, not vanity metrics.</p></div></li>
+        </ol>
+      </section>
+
+      <section class="decision-strip" id="talk" data-i18n-section="talk" data-reveal>
+        <div class="decision-strip__inner">
+          <span class="eyebrow">Let's talk</span>
+          <h2>Find out if hyperlocal television makes sense for your business</h2>
+          <a class="cta-pill" href="#contact"><span class="cta-pill__full">Discuss my case, no commitment</span><span class="cta-pill__short">Discuss my case</span></a>
+        </div>
+      </section>
+    </main>
+
+    <Footer locale="en" />
+
+    <script>
+      const modules = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        modules.forEach((module) => module.classList.add('is-ready'));
+        const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+          if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
+        }), { threshold: 0.12 });
+        modules.forEach((module) => observer.observe(module));
+      }
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const countEls = document.querySelectorAll<HTMLElement>('.case-card__top strong[data-value]');
+      const formatCount = (el: HTMLElement, value: number) => {
+        const decimals = Number(el.dataset.decimals ?? '0');
+        return `${el.dataset.prefix ?? ''}${value.toFixed(decimals)}${el.dataset.suffix ?? ''}`;
+      };
+      const animateCount = (el: HTMLElement) => {
+        const target = Number(el.dataset.value);
+        if (prefersReducedMotion) { el.textContent = formatCount(el, target); return; }
+        const duration = 1200;
+        const start = performance.now();
+        const step = (now: number) => {
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = formatCount(el, target * eased);
+          if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      };
+      const countObserver = new IntersectionObserver((entries) => entries.forEach((entry) => {
+        if (entry.isIntersecting) { animateCount(entry.target as HTMLElement); countObserver.unobserve(entry.target); }
+      }), { threshold: 0.4 });
+      countEls.forEach((el) => countObserver.observe(el));
+    </script>
+  </body>
+</html>

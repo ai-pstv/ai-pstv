@@ -1,0 +1,121 @@
+@font-face {
+  font-family: 'Gotham Pro';
+  src: url('/fonts/gothampro-regular.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham Pro';
+  src: url('/fonts/gothampro-medium.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham Pro';
+  src: url('/fonts/gothampro-bold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 700 900;
+  font-display: swap;
+}
+
+/*
+ * Fuente única de verdad del theme.
+ * Cambiar un valor aquí actualiza todos los componentes de la web.
+ */
+:root {
+  /* Colores */
+  --color-brand: #cb7721;
+  --color-brand-hover: #ad6218;
+  --color-text: #231f20;
+  --color-text-muted: #686361;
+  --color-background: #ffffff;
+  --color-surface: #f5f2ee;
+  --color-border: #ded9d3;
+  --color-on-dark: #ffffff;
+  --color-on-dark-muted: #cfc9c6;
+  --color-dark-border: #514b4b;
+
+  /* Familias y pesos */
+  --font-family-base: 'Gotham Pro', Arial, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 800;
+
+  /* Escala tipográfica */
+  --font-size-label: 0.6875rem;
+  --font-size-body: 1.0625rem;
+  --font-size-title-3: 1.5rem;
+  --font-size-title-2: 2.25rem;
+  --font-size-title-1: 3rem;
+  --font-size-display: clamp(3.625rem, 8vw, 7rem);
+  --line-height-body: 1.6;
+  --line-height-heading: 0.95;
+
+  /* Forma y estructura */
+  --radius-small: 10px;
+  --radius-medium: 18px;
+  --radius-pill: 999px;
+  --page-width: min(1280px, calc(100% - 48px));
+
+  /* Alias semánticos consumidos por los componentes actuales */
+  --orange: var(--color-brand);
+  --ink: var(--color-text);
+  --muted: var(--color-text-muted);
+  --paper: var(--color-background);
+  --sand: var(--color-surface);
+  --line: var(--color-border);
+  --radius: var(--radius-medium);
+  --page: var(--page-width);
+}
+
+body {
+  font-family: var(--font-family-base);
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+/* Variante oscura reversible para comparar el look & feel. */
+body[data-theme='dark'] {
+  --color-background: #171415;
+  --color-surface: #252122;
+  --color-text: #faf7f3;
+  --color-text-muted: #c9c1bd;
+  --color-border: #4e4745;
+  --color-on-dark: #ffffff;
+  --color-on-dark-muted: #d8d0cc;
+  --color-dark-border: #554d4b;
+  background: var(--color-background);
+}
+
+body[data-theme='dark'] .hero,
+body[data-theme='dark'] .belief-shift,
+body[data-theme='dark'] .cases,
+body[data-theme='dark'] .theme-section,
+body[data-theme='dark'] footer,
+body[data-theme='dark'] .tree-summary,
+body[data-theme='dark'] .mobile-navigation:not([hidden]) { background: #100e0f; }
+body[data-theme='dark'] .navigation-section { background: #211d1e; }
+body[data-theme='dark'] .sector:hover { background: #352c27; border-color: var(--color-brand); }
+body[data-theme='dark'] .site-header__menu { color: var(--color-text); }
+
+.hero h1 {
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-heading);
+  font-weight: var(--font-weight-black);
+}
+
+.type-0 { font-size: var(--font-size-title-1); font-weight: var(--font-weight-black); }
+.type-2 { font-size: var(--font-size-title-2); font-weight: var(--font-weight-bold); }
+.type-3 { font-size: var(--font-size-title-3); font-weight: var(--font-weight-bold); }
+.type-4 { font-size: var(--font-size-body); line-height: var(--line-height-body); font-weight: var(--font-weight-regular); }
+.type-5 { font-size: var(--font-size-label); font-weight: var(--font-weight-bold); }
+
+@media (max-width: 620px) {
+  :root { --page-width: calc(100% - 36px); }
+}

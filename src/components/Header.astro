@@ -1,0 +1,149 @@
+---
+interface Props {
+  locale?: 'es' | 'en' | 'ca';
+}
+
+const { locale = 'es' } = Astro.props;
+
+const translations = {
+  es: { about: 'Quiénes somos', media: '+Cerca Media', exclusivity: 'Exclusividad con Atresmedia', solutions: 'Soluciones', cases: 'Casos de éxito', greeting: '', cta: 'Contactar', menu: 'Menú', close: 'Cerrar', navigation: 'Navegación', appearance: 'Apariencia', dark: 'Oscuro', light: 'Claro' },
+  en: { about: 'About us', media: '+Cerca Media', exclusivity: 'Exclusivity with Atresmedia', solutions: 'Solutions', cases: 'Success stories', greeting: '', cta: 'Contact', menu: 'Menu', close: 'Close', navigation: 'Navigation', appearance: 'Appearance', dark: 'Dark', light: 'Light' },
+  ca: { about: 'Qui som', media: '+Cerca Media', exclusivity: 'Exclusivitat amb Atresmedia', solutions: 'Solucions', cases: 'Casos d’èxit', greeting: '', cta: 'Contacta’ns', menu: 'Menú', close: 'Tanca', navigation: 'Navegació', appearance: 'Aparença', dark: 'Fosc', light: 'Clar' },
+};
+
+const translation = translations[locale];
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const path = (p: string) => `${base}${p}`;
+
+const items = [
+  { label: translation.about, href: path('/quienes-somos') },
+  { label: translation.media, href: path('/mas-cerca-media') },
+  { label: translation.exclusivity, href: path('/exclusividad-atresmedia') },
+  { label: translation.solutions, href: path('/soluciones') },
+  { label: translation.cases, href: path('/casos-de-exito') },
+];
+
+const languages = [
+  { code: 'es', shortLabel: 'ES', longLabel: 'Español', href: path('/') },
+  { code: 'en', shortLabel: 'EN', longLabel: 'English', href: path('/en/') },
+  { code: 'ca', shortLabel: 'CA', longLabel: 'Català', href: path('/ca/') },
+];
+
+const homeHref = languages.find((lang) => lang.code === locale)?.href ?? path('/');
+---
+
+<header class="site-header" data-site-header data-base={base}>
+  <div class="site-header__inner">
+    <a class="site-header__logo" href={homeHref} aria-label="+CercaTV, ir al inicio">
+      <img src={path('/images/brand/cercatv-logo-color.svg')} width="609" height="201" alt="Atresmedia +CercaTV" />
+    </a>
+
+    <nav class="site-header__nav" aria-label="Navegación principal">
+      {items.map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+
+    <div class="site-header__actions">
+      <button class="theme-switcher" type="button" data-theme-toggle data-dark-label={translation.dark} data-light-label={translation.light} aria-pressed="false">{translation.dark}</button>
+      <div class="language-switcher" aria-label="Seleccionar idioma">
+        {languages.map((lang, index) => (
+          <>
+            {index > 0 && <span aria-hidden="true"></span>}
+            <a href={lang.href} data-language-link aria-current={locale === lang.code ? 'true' : undefined}>{lang.shortLabel}</a>
+          </>
+        ))}
+      </div>
+      <a class="site-header__cta" href={path('/contacto')}>{translation.cta}</a>
+      <button class="site-header__menu" type="button" aria-expanded="false" aria-controls="mobile-navigation">{translation.menu}</button>
+    </div>
+  </div>
+
+  <div class="mobile-navigation" id="mobile-navigation" hidden>
+    <div class="mobile-navigation__top">
+      <span>{translation.navigation}</span>
+      <button type="button" data-menu-close>{translation.close}</button>
+    </div>
+    <nav aria-label="Navegación móvil">
+      {items.map((item, index) => <a href={item.href}><span>0{index + 1}</span>{item.label}</a>)}
+    </nav>
+    <div class="mobile-navigation__bottom">
+      <div class="mobile-theme-control">
+        <span>{translation.appearance}</span>
+        <button class="theme-switcher theme-switcher--mobile" type="button" data-theme-toggle data-dark-label={translation.dark} data-light-label={translation.light} aria-pressed="false">{translation.dark}</button>
+      </div>
+      <div class="language-switcher language-switcher--mobile" aria-label="Seleccionar idioma">
+        {languages.map((lang) => (
+          <a href={lang.href} data-language-link data-mobile-language-link aria-current={locale === lang.code ? 'true' : undefined}>{lang.longLabel}</a>
+        ))}
+      </div>
+      <a class="site-header__cta site-header__cta--mobile" href={path('/contacto')}>{translation.cta}</a>
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+  const menuButton = header?.querySelector<HTMLButtonElement>('.site-header__menu');
+  const closeButton = header?.querySelector<HTMLButtonElement>('[data-menu-close]');
+  const mobileNavigation = header?.querySelector<HTMLElement>('#mobile-navigation');
+
+  const setMenu = (open: boolean) => {
+    if (!menuButton || !mobileNavigation) return;
+    menuButton.setAttribute('aria-expanded', String(open));
+    mobileNavigation.hidden = !open;
+    document.body.classList.toggle('menu-open', open);
+    if (open) closeButton?.focus();
+    else menuButton.focus();
+  };
+
+  menuButton?.addEventListener('click', () => setMenu(menuButton.getAttribute('aria-expanded') !== 'true'));
+  closeButton?.addEventListener('click', () => setMenu(false));
+
+  if (sessionStorage.getItem('cercatv-reopen-mobile-menu') === 'true') {
+    sessionStorage.removeItem('cercatv-reopen-mobile-menu');
+    setMenu(true);
+  }
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menuButton?.getAttribute('aria-expanded') === 'true') setMenu(false);
+  });
+
+  const themeButtons = header ? [...header.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')] : [];
+  const logo = header?.querySelector<HTMLImageElement>('.site-header__logo img');
+  const setTheme = (theme: 'clear' | 'dark') => {
+    document.body.dataset.theme = theme;
+    themeButtons.forEach((button) => {
+      button.setAttribute('aria-pressed', String(theme === 'dark'));
+      button.textContent = theme === 'dark' ? button.dataset.lightLabel ?? 'Claro' : button.dataset.darkLabel ?? 'Oscuro';
+    });
+    const base = header?.dataset.base ?? '';
+    if (logo) logo.src = theme === 'dark' ? `${base}/images/brand/cercatv-logo-dark.svg` : `${base}/images/brand/cercatv-logo-color.svg`;
+    localStorage.setItem('cercatv-theme', theme);
+  };
+  const savedTheme = localStorage.getItem('cercatv-theme');
+  if (savedTheme === 'dark') setTheme('dark');
+  themeButtons.forEach((button) => button.addEventListener('click', () => setTheme(document.body.dataset.theme === 'dark' ? 'clear' : 'dark')));
+
+  header?.querySelectorAll<HTMLAnchorElement>('[data-language-link]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      const sections = [...document.querySelectorAll<HTMLElement>('[data-i18n-section]')];
+      const viewportCenter = window.innerHeight / 2;
+      const currentSection = sections.find((section) => {
+        const bounds = section.getBoundingClientRect();
+        return bounds.top <= viewportCenter && bounds.bottom >= viewportCenter;
+      }) ?? sections.reduce<HTMLElement | undefined>((closest, section) => {
+        const distance = Math.abs(section.getBoundingClientRect().top - viewportCenter);
+        return !closest || distance < Math.abs(closest.getBoundingClientRect().top - viewportCenter) ? section : closest;
+      }, undefined);
+      const targetSection = currentSection?.dataset.i18nSection;
+      if (!targetSection) return;
+      event.preventDefault();
+      if (link.hasAttribute('data-mobile-language-link') && menuButton?.getAttribute('aria-expanded') === 'true') {
+        sessionStorage.setItem('cercatv-reopen-mobile-menu', 'true');
+      }
+      const destination = new URL(link.href);
+      destination.hash = targetSection;
+      window.location.assign(destination.toString());
+    });
+  });
+</script>

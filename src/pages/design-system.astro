@@ -1,0 +1,129 @@
+---
+import '../styles/global.css';
+import '../styles/tokens.css';
+import '../styles/header.css';
+import Header from '../components/Header.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const navigation = [
+  ['Home · /', 'Landing principal y conversión', ['Hero', 'Por qué TV hiperlocal', 'Cómo funciona', 'Atresmedia', 'Para quién', 'Resultados destacados', 'FAQ', 'Estudiar mi campaña']],
+  ['Agencias · /agencias', 'Landing específica para agencias', ['Propuesta para agencias', 'Ventajas', 'Cómo colaborar', 'Formulario: Descargar Media Kit']],
+  ['Casos · /casos', 'Archivo administrable por sector', ['Todos los casos', 'Filtro familia', 'Filtro subfamilia', 'Ficha individual · /casos/[slug]']],
+  ['CMS · acceso interno', 'Gestión editorial, no visible en el menú', ['Título', 'Familia', 'Subfamilia', 'Objetivo', 'Solución', 'Resultados', 'Testimonio', 'Imagen', 'Destacado: sí/no', 'Estado']],
+];
+
+const palette = [
+  ['Naranja Cerca', '#CB7721', 'Marca, llamadas a la acción y acentos'],
+  ['Negro carbón', '#231F20', 'Titulares y fondos de alto contraste'],
+  ['Blanco', '#FFFFFF', 'Fondos, aire y texto invertido'],
+  ['Arena suave', '#F5F2EE', 'Secciones alternas y tarjetas'],
+  ['Gris texto', '#686361', 'Texto secundario y metadatos'],
+];
+
+const typeScale = [
+  ['Display', 'Televisión que genera negocio', '64 / 64 · 800'],
+  ['Título 1', 'Publicidad más cerca', '48 / 52 · 800'],
+  ['Título 2', 'Precisión local, potencia nacional', '36 / 42 · 700'],
+  ['Título 3', 'Resultados medibles', '24 / 30 · 700'],
+  ['Cuerpo', 'Impacta en los códigos postales, barrios o ciudades que te interesan.', '17 / 27 · 400'],
+  ['Etiqueta', 'SEGMENTACIÓN HIPERLOCAL', '12 / 16 · 700'],
+];
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <script is:inline>
+      (function () {
+        if (sessionStorage.getItem('cercatv-auth') === '1') return;
+        let ok = false;
+        while (!ok) {
+          const u = prompt('Usuario');
+          const p = prompt('Contraseña');
+          if (u === 'Cidoncha' && p === '007007') { sessionStorage.setItem('cercatv-auth', '1'); ok = true; }
+        }
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="Mapa de navegación y sistema visual propuesto para +CercaTV" />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="preload" href={`${base}/fonts/gothampro-regular.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={`${base}/fonts/gothampro-bold.woff2`} as="font" type="font/woff2" crossorigin />
+    <title>Documentación interna · Arquitectura y theme · +CercaTV</title>
+  </head>
+  <body>
+    <Header />
+
+    <main>
+      <section class="section navigation-section" id="navigation" data-reveal>
+        <div class="section-heading"><div><span>01</span><h2>Árbol de navegación</h2></div><p>Una home extensa para explicar y convertir, una landing breve para agencias y casos de éxito gestionados desde un CMS.</p></div>
+        <div class="tree-layout">
+          <aside class="tree-summary"><span class="mini-label">Raíz</span><h3>cercatv.es</h3><p>El menú público enlaza secciones clave de la home y da acceso a Agencias y Casos. El CMS queda fuera de la navegación pública.</p><div class="legend"><span>Página pública</span><span>Sección de home</span><span>Contenido CMS</span></div></aside>
+          <div class="tree">
+            {navigation.map(([label, note, children], index) => (
+              <article class="tree-item">
+                <button class="tree-trigger" type="button" aria-expanded={index === 0 ? 'true' : 'false'}>
+                  <span class="tree-index">0{index + 1}</span><span class="tree-title"><strong>{label}</strong><small>{note}</small></span><span class="tree-toggle">+</span>
+                </button>
+                <div class="tree-children" hidden={index !== 0}>{(children as string[]).map((child) => <span>{child}</span>)}</div>
+              </article>
+            ))}
+            <article class="tree-item tree-cta"><div class="tree-trigger static"><span class="tree-index">CTA</span><span class="tree-title"><strong>Estudiar mi campaña</strong><small>El mismo formulario desde todos los puntos de conversión</small></span><span class="cta-dot"></span></div></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section theme-section" id="theme" data-reveal>
+        <div class="section-heading inverse"><div><span>02</span><h2>Theme styles</h2></div><p>El sistema parte del manual: Gotham Pro local, naranja corporativo, negro y blanco.</p></div>
+        <div class="theme-tabs" role="tablist"><button role="tab" aria-selected="true" data-tab="colors">Colores</button><button role="tab" aria-selected="false" data-tab="type">Tipografía</button><button role="tab" aria-selected="false" data-tab="spacing">Espaciado</button></div>
+        <div class="tab-panel" data-panel="colors">
+          <div class="color-grid">{palette.map(([name, value, usage]) => <article class="color-card" style={`--swatch:${value}`}><div class="color-swatch"><span>{value}</span></div><div class="color-info"><strong>{name}</strong><p>{usage}</p></div></article>)}</div>
+          <p class="usage-note"><strong>Regla de presencia:</strong> el naranja guía, no invade. El blanco aporta amplitud y el negro concentra la autoridad de marca.</p>
+        </div>
+        <div class="tab-panel" data-panel="type" hidden>
+          <div class="theme-intro"><span>Familia principal</span><strong>Gotham Pro</strong><p>Fuente corporativa alojada localmente para titulares, interfaz y texto de lectura.</p></div>
+          <div class="type-list">{typeScale.map(([token, sample, spec], index) => <article><div><span>{token}</span><small>{spec}</small></div><p class={`type-${index}`}>{sample}</p></article>)}</div>
+        </div>
+        <div class="tab-panel" data-panel="spacing" hidden>
+          <div class="theme-intro"><span>Unidad base</span><strong>8 px</strong><p>Una escala corta mantiene el ritmo consistente desde una etiqueta hasta una sección completa.</p></div>
+          <div class="spacing-scale">{[8,16,24,32,48,64,96].map((space) => <div><span style={`width:${space}px`}></span><strong>{space}</strong><small>px</small></div>)}</div>
+        </div>
+      </section>
+
+      <section class="section components-section" id="components" data-reveal>
+        <div class="section-heading"><div><span>03</span><h2>Componentes base</h2></div><p>Los componentes reflejan ahora las dos conversiones confirmadas y el contenido administrable de los casos.</p></div>
+        <div class="component-grid">
+          <article class="component-card buttons-card"><span class="mini-label">Conversiones</span><div class="button-stack"><button class="button primary">Estudiar mi campaña</button><button class="button secondary">Descargar Media Kit</button><button class="button text">Ver casos de éxito →</button></div></article>
+          <article class="component-card benefit-card"><span class="mini-label">Tarjeta de beneficio</span><div class="benefit-number">+34%</div><h3>Más audiencia en ventas locales</h3><p>Una cifra protagonista, contexto breve y lectura inmediata.</p></article>
+          <article class="component-card quote-card"><span class="mini-label">Testimonio</span><blockquote>“Segmentamos por código postal y alcanzamos exactamente a los clientes que queríamos.”</blockquote><div><strong>María Sola</strong><span>Directora · Cliente local</span></div></article>
+          <article class="component-card faq-card"><span class="mini-label">Caso administrable</span><details open><summary>Clasificación editorial</summary><p>Familia, subfamilia, estado y campo destacado para decidir en qué zonas aparece cada caso.</p></details><details><summary>Contenido de la ficha</summary><p>Objetivo, solución, resultados, métricas, testimonio, imagen y canales utilizados.</p></details></article>
+        </div>
+      </section>
+
+      <section class="decision-strip" data-reveal><span>Siguiente decisión</span><h2>Elegir el CMS y cerrar el destino de los formularios.</h2><a href="#navigation">Revisar arquitectura</a></section>
+    </main>
+    <footer><span>+CercaTV · Documento de trabajo</span><span>Arquitectura y sistema visual · v0.2</span></footer>
+
+    <script>
+      document.querySelectorAll<HTMLButtonElement>('.tree-trigger:not(.static)').forEach((trigger) => trigger.addEventListener('click', () => {
+        const panel = trigger.nextElementSibling as HTMLElement; const expanded = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', String(!expanded)); panel.hidden = expanded;
+      }));
+      document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((tab) => tab.addEventListener('click', () => {
+        document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((item) => item.setAttribute('aria-selected', String(item === tab)));
+        document.querySelectorAll<HTMLElement>('[data-panel]').forEach((panel) => panel.hidden = panel.dataset.panel !== tab.dataset.tab);
+      }));
+      const modules = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        modules.forEach((module) => module.classList.add('is-ready'));
+        const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+          if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
+        }), { threshold: 0.12 });
+        modules.forEach((module) => observer.observe(module));
+      }
+    </script>
+  </body>
+</html>
