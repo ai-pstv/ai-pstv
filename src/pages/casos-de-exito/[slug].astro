@@ -1,0 +1,111 @@
+---
+import { getCollection } from 'astro:content';
+import '../../styles/global.css';
+import '../../styles/tokens.css';
+import '../../styles/header.css';
+import '../../styles/footer.css';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+export async function getStaticPaths() {
+  const casos = await getCollection('casos');
+  return casos.map((caso) => ({
+    params: { slug: caso.id },
+    props: { caso },
+  }));
+}
+
+const { caso } = Astro.props;
+const c = caso.data;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const resultadoTexto = `${c.resultadoPrefijo}${c.resultadoValor.toFixed(c.resultadoDecimales)}${c.resultadoSufijo}`;
+
+const pinIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>';
+const productIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="18" height="7" rx="2"/><path d="M5 10 7 5h10l2 5"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/></svg>';
+const chartIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>';
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <script is:inline>
+      (function () {
+        if (sessionStorage.getItem('cercatv-auth') === '1') return;
+        let ok = false;
+        while (!ok) {
+          const u = prompt('Usuario');
+          const p = prompt('Contraseña');
+          if (u === 'Cidoncha' && p === '007007') { sessionStorage.setItem('cercatv-auth', '1'); ok = true; }
+        }
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content={c.descripcion} />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="preload" href={`${base}/fonts/gothampro-regular.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={`${base}/fonts/gothampro-bold.woff2`} as="font" type="font/woff2" crossorigin />
+    <title>{c.titulo} · Caso de éxito | +CercaTV</title>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section class="case-story" aria-labelledby="case-story-title">
+        <a class="case-story__back" href={`${base}/casos-de-exito`}>← Volver a casos de éxito</a>
+
+        <div class="case-story__head">
+          <span class="case-tile__badge">Caso de éxito · {c.index}</span>
+          <span class="case-story__category">{c.categoria}</span>
+        </div>
+
+        <h1 id="case-story-title">{c.titulo}</h1>
+        <p class="case-story__subtitle">{c.subtitulo}</p>
+        <p class="case-story__description">{c.descripcion}</p>
+
+        <div class="case-story__image">
+          <span class="case-story__image-tag">Creatividad emitida</span>
+          <span class="case-story__image-placeholder">Fotograma real de la creatividad emitida, pendiente de sustituir por la captura del anuncio.</span>
+        </div>
+
+        <div class="case-story__facts">
+          <div class="case-tile__meta-item"><span class="case-tile__meta-icon" aria-hidden="true" set:html={pinIcon} /><div><span>Ubicación</span><strong>{c.ubicacion}</strong></div></div>
+          <div class="case-tile__meta-item"><span class="case-tile__meta-icon" aria-hidden="true" set:html={productIcon} /><div><span>Producto</span><strong>{c.producto}</strong></div></div>
+          <div class="case-tile__meta-item"><span class="case-tile__meta-icon" aria-hidden="true" set:html={chartIcon} /><div><strong data-prefix={c.resultadoPrefijo} data-value={c.resultadoValor} data-suffix={c.resultadoSufijo} data-decimals={c.resultadoDecimales}>{resultadoTexto}</strong><span>{c.resultadoDescripcion}</span></div></div>
+        </div>
+
+        <a class="cta-pill case-story__cta" href={`${base}/#contacto`}>Quiero un caso como este</a>
+      </section>
+    </main>
+    <Footer />
+
+    <script>
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const el = document.querySelector<HTMLElement>('.case-story__facts strong[data-value]');
+      if (el) {
+        const target = Number(el.dataset.value);
+        const decimals = Number(el.dataset.decimals ?? '0');
+        const format = (value: number) => `${el.dataset.prefix ?? ''}${value.toFixed(decimals)}${el.dataset.suffix ?? ''}`;
+        if (prefersReducedMotion) {
+          el.textContent = format(target);
+        } else {
+          const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            observer.unobserve(entry.target);
+            const duration = 1200;
+            const start = performance.now();
+            const step = (now: number) => {
+              const progress = Math.min((now - start) / duration, 1);
+              const eased = 1 - Math.pow(1 - progress, 3);
+              el.textContent = format(target * eased);
+              if (progress < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+          }), { threshold: 0.4 });
+          observer.observe(el);
+        }
+      }
+    </script>
+  </body>
+</html>

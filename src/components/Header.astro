@@ -24,13 +24,40 @@ const items = [
   { label: translation.cases, href: path('/casos-de-exito') },
 ];
 
+// Al cambiar de idioma, mantener la misma página actual (solo cambia el prefijo de idioma en la ruta).
+const currentPathNoBase = (() => {
+  const full = Astro.url.pathname;
+  const stripped = base && full.startsWith(base) ? full.slice(base.length) : full;
+  return stripped.startsWith('/') ? stripped : `/${stripped}`;
+})();
+
+const pathWithoutLocale = (() => {
+  if (currentPathNoBase === '/en' || currentPathNoBase.startsWith('/en/')) {
+    return currentPathNoBase.slice(3) || '/';
+  }
+  if (currentPathNoBase === '/ca' || currentPathNoBase.startsWith('/ca/')) {
+    return currentPathNoBase.slice(3) || '/';
+  }
+  return currentPathNoBase;
+})();
+
+// Solo la home existe traducida en los 3 idiomas por ahora. El resto de páginas (casos de éxito, etc.)
+// solo existen en español, así que el selector de idioma debe quedarse en la versión en español
+// de esa misma página en vez de romper en un 404.
+const hasTranslations = pathWithoutLocale === '/';
+
+const hrefForLocale = (code: 'es' | 'en' | 'ca') => {
+  if (code === 'es' || !hasTranslations) return path(pathWithoutLocale);
+  return path(`/${code}${pathWithoutLocale}`);
+};
+
 const languages = [
-  { code: 'es', shortLabel: 'ES', longLabel: 'Español', href: path('/') },
-  { code: 'en', shortLabel: 'EN', longLabel: 'English', href: path('/en/') },
-  { code: 'ca', shortLabel: 'CA', longLabel: 'Català', href: path('/ca/') },
+  { code: 'es' as const, shortLabel: 'ES', longLabel: 'Español', href: hrefForLocale('es') },
+  { code: 'en' as const, shortLabel: 'EN', longLabel: 'English', href: hrefForLocale('en') },
+  { code: 'ca' as const, shortLabel: 'CA', longLabel: 'Català', href: hrefForLocale('ca') },
 ];
 
-const homeHref = languages.find((lang) => lang.code === locale)?.href ?? path('/');
+const homeHref = path(locale === 'es' ? '/' : `/${locale}/`);
 ---
 
 <header class="site-header" data-site-header data-base={base}>

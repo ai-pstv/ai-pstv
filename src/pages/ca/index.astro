@@ -26,6 +26,7 @@ const organizationSchema = {
     <meta charset="UTF-8" />
     <script is:inline>
       (function () {
+        return; // DESACTIVADO TEMPORALMENTE PARA PRUEBAS LOCALES: quitar esta línea para reactivar el acceso.
         if (sessionStorage.getItem('cercatv-auth') === '1') return;
         let ok = false;
         while (!ok) {

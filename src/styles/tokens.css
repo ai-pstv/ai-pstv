@@ -1,6 +1,8 @@
+/* Rutas con el base del sitio (/ai-web) incluido: al ser un @font-face con ruta absoluta,
+   Vite no la reescribe automáticamente como hace con el resto de assets. */
 @font-face {
   font-family: 'Gotham Pro';
-  src: url('/fonts/gothampro-regular.woff2') format('woff2');
+  src: url('/ai-web/fonts/gothampro-regular.woff2') format('woff2');
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -8,7 +10,7 @@
 
 @font-face {
   font-family: 'Gotham Pro';
-  src: url('/fonts/gothampro-medium.woff2') format('woff2');
+  src: url('/ai-web/fonts/gothampro-medium.woff2') format('woff2');
   font-style: normal;
   font-weight: 500;
   font-display: swap;
@@ -16,7 +18,7 @@
 
 @font-face {
   font-family: 'Gotham Pro';
-  src: url('/fonts/gothampro-bold.woff2') format('woff2');
+  src: url('/ai-web/fonts/gothampro-bold.woff2') format('woff2');
   font-style: normal;
   font-weight: 700 900;
   font-display: swap;
