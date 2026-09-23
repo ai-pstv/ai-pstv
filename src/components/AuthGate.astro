@@ -1,0 +1,17 @@
+---
+// Acceso simple con usuario/contraseña solo en producción (build). En local (astro dev) no se pide.
+const enabled = !import.meta.env.DEV;
+---
+{enabled && (
+  <script is:inline>
+    (function () {
+      if (sessionStorage.getItem('cercatv-auth') === '1') return;
+      let ok = false;
+      while (!ok) {
+        const u = prompt('Usuario');
+        const p = prompt('Contraseña');
+        if (u === 'Cidoncha' && p === '007007') { sessionStorage.setItem('cercatv-auth', '1'); ok = true; }
+      }
+    })();
+  </script>
+)}

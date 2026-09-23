@@ -1,0 +1,234 @@
+---
+import '../styles/global.css';
+import '../styles/tokens.css';
+import '../styles/header.css';
+import '../styles/footer.css';
+import Header from '../components/Header.astro';
+import AuthGate from '../components/AuthGate.astro';
+import Footer from '../components/Footer.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const siteOrigin = 'https://publicidadsegmentadatv.com';
+const pageUrl = `${siteOrigin}${base}/preguntas-frecuentes/`;
+
+const icons: Record<string, string> = {
+  all: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v.01"/>',
+  building: '<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/>',
+  tv: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 3l4 3 4-3"/>',
+  pin: '<path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+  users: '<circle cx="9" cy="8" r="3.2"/><path d="M2.8 19a6.2 6.2 0 0 1 12.4 0"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.5 13.2a5 5 0 0 1 5.7 5.8"/>',
+  monitor: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/>',
+  palette: '<circle cx="12" cy="12" r="9"/><circle cx="8.2" cy="10.5" r="1.1"/><circle cx="12" cy="7.8" r="1.1"/><circle cx="15.8" cy="10.5" r="1.1"/><path d="M9 15.5c.8.7 1.9 1 3 1 2 0 3.5-1.1 3.5-2.6 0-.8-.7-1.1-1.6-1.1H13c-1 0-1.6-.5-1.6-1.3"/>',
+  tag: '<path d="M12.6 3H20v7.4a2 2 0 0 1-.6 1.4l-7.6 7.6a2 2 0 0 1-2.8 0L3.6 14a2 2 0 0 1 0-2.8L11.2 3.6a2 2 0 0 1 1.4-.6z"/><circle cx="16" cy="8" r="1.3"/>',
+  chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  sectors: '<rect x="3" y="10" width="6" height="11" rx="1"/><rect x="9.5" y="5" width="6" height="16" rx="1"/><rect x="16" y="13" width="6" height="8" rx="1"/>',
+  lock: '<rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+  scale: '<path d="M12 3v18M6 7h12M4 7l3 6a3 3 0 0 0 6 0L10 7M14 7l3 6a3 3 0 0 0 6 0l-3-6"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+};
+
+const categories = [
+  { id: 'todo', label: 'Todo', icon: 'all', tagline: '' },
+  { id: 'que-es', label: 'Qué es +CercaTV y cómo funciona', icon: 'info', tagline: 'La idea, en pocas palabras' },
+  { id: 'empresa', label: 'Empresa / +Cerca Media', icon: 'building', tagline: 'Quién está detrás' },
+  { id: 'atresmedia', label: 'Atresmedia y canales', icon: 'tv', tagline: 'Dónde se emite tu anuncio' },
+  { id: 'geografica', label: 'Segmentación geográfica', icon: 'pin', tagline: 'Llega solo a las zonas que te interesan' },
+  { id: 'audiencia', label: 'Segmentación de audiencia', icon: 'users', tagline: 'A quién le llega tu anuncio' },
+  { id: 'hbbtv', label: 'HbbTV y tecnología', icon: 'monitor', tagline: 'La tecnología detrás de la segmentación' },
+  { id: 'creatividades', label: 'Creatividades y formatos', icon: 'palette', tagline: 'Qué anuncio se emite' },
+  { id: 'precio', label: 'Precio, inversión y contratación', icon: 'tag', tagline: 'Cuánto cuesta y cómo se contrata' },
+  { id: 'medicion', label: 'Medición y resultados', icon: 'chart', tagline: 'Cómo sabes si está funcionando' },
+  { id: 'sectores', label: 'Sectores y casos de uso', icon: 'sectors', tagline: 'Para qué tipo de negocio' },
+  { id: 'privacidad', label: 'Privacidad y tratamiento de datos', icon: 'lock', tagline: 'Cómo se tratan los datos' },
+  { id: 'comparativas', label: 'Comparaciones y conceptos relacionados', icon: 'scale', tagline: 'En qué se diferencia de otras opciones' },
+];
+
+const faqs = [
+  { cat: 'que-es', q: '¿Qué es +CercaTV?', a: 'Es un servicio de publicidad en televisión segmentada geográficamente: tu anuncio se emite en los canales de Atresmedia, pero solo en la zona (código postal, barrio o ciudad) que te interesa, en vez de a toda España.' },
+  { cat: 'que-es', q: '¿Cómo funciona la publicidad segmentada en televisión?', a: 'La emisión se limita técnicamente a la cobertura de la zona elegida, de forma que un negocio local puede anunciarse en TV sin pagar por llegar a espectadores fuera de su área de influencia.' },
+  { cat: 'empresa', q: '¿Qué es +Cerca Media?', a: '+Cerca Media es la parte del proyecto que gestiona la relación con el anunciante: define contigo la zona, el objetivo y el formato de la campaña antes de activarla.' },
+  { cat: 'empresa', q: '¿Con quién voy a trabajar si contrato una campaña?', a: 'Tienes un único punto de contacto durante todo el proceso, desde la definición de la campaña hasta el seguimiento de resultados.' },
+  { cat: 'atresmedia', q: '¿En qué canales se emiten los anuncios?', a: 'En los canales del grupo Atresmedia, aprovechando su audiencia y su entorno premium de emisión.' },
+  { cat: 'atresmedia', q: '¿Por qué Atresmedia y no otra televisión?', a: 'Por ser uno de los grupos de televisión con mayor audiencia en España, lo que da a la campaña la credibilidad y el alcance propios de la televisión tradicional, ahora con segmentación local.' },
+  { cat: 'geografica', q: '¿Puedo anunciarme solo en determinadas zonas?', a: 'Sí. Puedes concentrar tu campaña en la zona de cobertura real de tu negocio, en vez de emitir a nivel nacional.' },
+  { cat: 'geografica', q: '¿Puedo segmentar por código postal?', a: 'Sí, la segmentación se puede definir por código postal, barrio o ciudad, según las opciones disponibles en cada zona.' },
+  { cat: 'audiencia', q: '¿Puedo elegir a qué tipo de público llega mi anuncio?', a: 'Además de la zona, se puede afinar el perfil de audiencia (franja horaria, tipo de contenido en el que se inserta el anuncio, etc.) para acercarlo más a tu cliente objetivo.' },
+  { cat: 'audiencia', q: '¿Qué datos de audiencia se utilizan?', a: 'Se utilizan datos agregados y anónimos de audiencia televisiva, no datos personales identificables de los espectadores.' },
+  { cat: 'hbbtv', q: '¿Qué es HbbTV?', a: 'Es la tecnología de televisión híbrida (TV + internet) que permite, entre otras cosas, dirigir un anuncio a hogares concretos según su ubicación, sin depender solo de la señal de emisión tradicional.' },
+  { cat: 'hbbtv', q: '¿Necesito algo especial para que funcione en mi televisor?', a: 'No, la tecnología funciona del lado de la emisión; el espectador solo necesita un televisor compatible con HbbTV, cada vez más habitual en los hogares.' },
+  { cat: 'creatividades', q: '¿Necesito producir un anuncio de televisión?', a: 'No es obligatorio. Se puede trabajar tanto con creatividades ya existentes como con formatos más sencillos pensados para negocios locales, sin el coste ni los tiempos de una producción publicitaria tradicional.' },
+  { cat: 'creatividades', q: '¿Qué formatos de creatividad admite +CercaTV?', a: 'Se adaptan distintos formatos según el objetivo de la campaña y el material disponible del anunciante; se valora caso a caso al definir la campaña.' },
+  { cat: 'precio', q: '¿Cuál es la inversión mínima para empezar?', a: 'Depende de la zona y la duración de la campaña. Se estudia cada caso de forma personalizada antes de dar una cifra concreta.' },
+  { cat: 'precio', q: '¿Cómo se contrata una campaña?', a: 'Se parte de una conversación inicial para entender el objetivo de negocio, y a partir de ahí se define la propuesta de zona, formato e inversión.' },
+  { cat: 'medicion', q: '¿Cómo se mide el resultado de una campaña?', a: 'Se define contigo el objetivo de negocio antes de empezar (visitas, llamadas, matriculaciones, reservas...) y se hace seguimiento de esos datos durante y después de la campaña, no solo de audiencia.' },
+  { cat: 'medicion', q: '¿Qué informes recibo durante la campaña?', a: 'El seguimiento y la periodicidad de los informes se acuerdan según el objetivo definido para cada campaña.' },
+  { cat: 'sectores', q: '¿Para qué tipos de negocio está pensado +CercaTV?', a: 'Está pensado sobre todo para negocios con una zona de influencia concreta: concesionarios, clínicas, franquicias, retail, hostelería, entre otros.' },
+  { cat: 'sectores', q: '¿Tenéis casos de éxito reales?', a: 'Sí, puedes consultarlos en la sección de <a href="/casos-de-exito">casos de éxito</a> de la web.' },
+  { cat: 'privacidad', q: '¿Qué datos personales se utilizan para segmentar?', a: 'La segmentación geográfica y de audiencia se basa en datos agregados, no en el tratamiento de datos personales identificables de los espectadores.' },
+  { cat: 'privacidad', q: '¿Cumplís con el RGPD?', a: 'El tratamiento de cualquier dato del anunciante (no del espectador) se realiza conforme a la normativa de protección de datos vigente.' },
+  { cat: 'comparativas', q: '¿En qué se diferencia de la publicidad en TV tradicional?', a: 'La diferencia principal es la segmentación: en vez de pagar por una emisión nacional, el anuncio llega solo a la zona de cobertura real del negocio.' },
+  { cat: 'comparativas', q: '¿Es lo mismo que el marketing digital?', a: 'No, pero se complementa con él: aporta la credibilidad y el alcance de la televisión en el hogar, con una precisión de segmentación más propia del marketing digital.' },
+];
+
+// Texto plano de la respuesta (sin HTML) para el marcado estructurado FAQPage.
+const stripHtml = (html: string) => html.replace(/<[^>]+>/g, '');
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((item) => ({
+    '@type': 'Question',
+    name: stripHtml(item.q),
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: stripHtml(item.a),
+    },
+  })),
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Inicio', item: `${siteOrigin}${base}/` },
+    { '@type': 'ListItem', position: 2, name: 'Preguntas frecuentes', item: pageUrl },
+  ],
+};
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <AuthGate />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="Preguntas frecuentes sobre la publicidad en televisión hiperlocal de +CercaTV en los canales de Atresmedia." />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="preload" href={`${base}/fonts/gothampro-regular.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={`${base}/fonts/gothampro-bold.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="canonical" href={pageUrl} />
+    <title>Preguntas frecuentes | +CercaTV</title>
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  </head>
+  <body class="page-wide">
+    <Header />
+    <main>
+      <section class="faqs-hero">
+        <nav class="faqs-breadcrumb" aria-label="Ruta de navegación"><a href={`${base}/`}>Inicio</a><span>/</span><span>Preguntas frecuentes</span></nav>
+        <h1>Preguntas frecuentes</h1>
+        <p>Aquí encontrarás respuestas a las dudas más habituales sobre publicidad segmentada en televisión.</p>
+        <div class="faqs-search">
+          <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.search} />
+          <input type="search" id="faqs-search-input" placeholder="¿Qué quieres saber?" aria-label="Buscar en preguntas frecuentes" />
+        </div>
+      </section>
+
+      <section class="faqs-layout">
+        <aside class="faqs-sidebar" aria-label="Categorías">
+          <span class="faqs-sidebar__label">Categorías</span>
+          <ul>
+            {categories.map((cat, index) => (
+              <li>
+                <button type="button" class="faqs-cat" data-cat={cat.id} aria-pressed={index === 0 ? 'true' : 'false'}>
+                  <span class="faqs-cat-icon"><svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons[cat.icon]} /></span>
+                  <span>{cat.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        <div class="faqs-content">
+          <div class="faqs-content__head">
+            <h2 id="faqs-content-title">Todo</h2>
+            <span class="faqs-content__tag" id="faqs-content-tag" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons.pin} />
+              <span></span>
+            </span>
+          </div>
+
+          <div class="faqs-items" id="faqs-items">
+            {faqs.map((item, index) => (
+              <details class="faq-item" data-cat={item.cat} open={index === 1}>
+                <summary>{item.q}</summary>
+                <p set:html={item.a} />
+              </details>
+            ))}
+          </div>
+
+          <p class="faqs-empty" id="faqs-empty" hidden>No hay preguntas que coincidan con tu búsqueda.</p>
+        </div>
+      </section>
+
+      <section class="decision-strip">
+        <div class="decision-strip__inner">
+          <span class="eyebrow">¿Hablamos?</span>
+          <h2>¿No encuentras la respuesta que buscas?</h2>
+          <a class="cta-pill" href={`${base}/#contacto`}><span class="cta-pill__full">Estudiar mi caso sin compromiso</span><span class="cta-pill__short">Estudiar mi caso</span></a>
+        </div>
+      </section>
+    </main>
+    <Footer />
+
+    <script define:vars={{ categories }}>
+      const items = [...document.querySelectorAll('.faq-item')];
+      const catButtons = [...document.querySelectorAll('.faqs-cat')];
+      const titleEl = document.getElementById('faqs-content-title');
+      const tagEl = document.getElementById('faqs-content-tag');
+      const tagLabel = tagEl.querySelector('span');
+      const emptyEl = document.getElementById('faqs-empty');
+      const searchInput = document.getElementById('faqs-search-input');
+
+      let activeCat = 'todo';
+
+      const normalize = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+      const render = () => {
+        const query = normalize(searchInput.value.trim());
+        let visibleCount = 0;
+
+        items.forEach((item) => {
+          const matchesCat = activeCat === 'todo' || item.dataset.cat === activeCat;
+          const text = normalize(item.querySelector('summary').textContent + ' ' + item.querySelector('p').textContent);
+          const matchesQuery = !query || text.includes(query);
+          const show = matchesCat && matchesQuery;
+          item.hidden = !show;
+          if (show) visibleCount += 1;
+        });
+
+        emptyEl.hidden = visibleCount > 0;
+
+        const cat = categories.find((c) => c.id === activeCat);
+        titleEl.textContent = query ? `Resultados para "${searchInput.value.trim()}"` : cat.label;
+        if (!query && cat.tagline) {
+          tagLabel.textContent = cat.tagline;
+          tagEl.hidden = false;
+        } else {
+          tagEl.hidden = true;
+        }
+      };
+
+      catButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          activeCat = button.dataset.cat;
+          catButtons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+          render();
+        });
+      });
+
+      searchInput.addEventListener('input', render);
+
+      items.forEach((item) => {
+        item.addEventListener('toggle', () => {
+          if (!item.open) return;
+          items.forEach((other) => { if (other !== item) other.open = false; });
+        });
+      });
+
+      render();
+    </script>
+  </body>
+</html>

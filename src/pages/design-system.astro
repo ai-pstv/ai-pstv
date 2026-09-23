@@ -3,6 +3,7 @@ import '../styles/global.css';
 import '../styles/tokens.css';
 import '../styles/header.css';
 import Header from '../components/Header.astro';
+import AuthGate from '../components/AuthGate.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -35,18 +36,7 @@ const typeScale = [
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <script is:inline>
-      (function () {
-        return; // DESACTIVADO TEMPORALMENTE PARA PRUEBAS LOCALES: quitar esta línea para reactivar el acceso.
-        if (sessionStorage.getItem('cercatv-auth') === '1') return;
-        let ok = false;
-        while (!ok) {
-          const u = prompt('Usuario');
-          const p = prompt('Contraseña');
-          if (u === 'Cidoncha' && p === '007007') { sessionStorage.setItem('cercatv-auth', '1'); ok = true; }
-        }
-      })();
-    </script>
+    <AuthGate />
     <meta name="viewport" content="width=device-width" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="description" content="Mapa de navegación y sistema visual propuesto para +CercaTV" />

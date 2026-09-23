@@ -1,13 +1,13 @@
 .site-footer {
   display: block;
-  padding: clamp(56px, 8vw, 96px) max(24px, calc((100vw - 1280px) / 2)) 32px;
+  padding: clamp(56px, 8vw, 96px) max(24px, calc((100vw - var(--container-max)) / 2)) 32px;
   background: var(--color-text);
   color: var(--color-on-dark);
 }
 
 .site-footer__top {
   width: 100%;
-  max-width: 1150px;
+  max-width: var(--content-width);
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -65,7 +65,7 @@
 
 .site-footer__bottom {
   width: 100%;
-  max-width: 1150px;
+  max-width: var(--content-width);
   margin: 48px auto 0;
   padding-top: 24px;
   display: flex;

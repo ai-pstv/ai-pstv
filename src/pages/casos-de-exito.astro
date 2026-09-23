@@ -5,6 +5,7 @@ import '../styles/tokens.css';
 import '../styles/header.css';
 import '../styles/footer.css';
 import Header from '../components/Header.astro';
+import AuthGate from '../components/AuthGate.astro';
 import Footer from '../components/Footer.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -53,18 +54,7 @@ const filters = [
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <script is:inline>
-      (function () {
-        return; // DESACTIVADO TEMPORALMENTE PARA PRUEBAS LOCALES: quitar esta línea para reactivar el acceso.
-        if (sessionStorage.getItem('cercatv-auth') === '1') return;
-        let ok = false;
-        while (!ok) {
-          const u = prompt('Usuario');
-          const p = prompt('Contraseña');
-          if (u === 'Cidoncha' && p === '007007') { sessionStorage.setItem('cercatv-auth', '1'); ok = true; }
-        }
-      })();
-    </script>
+    <AuthGate />
     <meta name="viewport" content="width=device-width" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="description" content="Casos de éxito reales de marcas que usan televisión hiperlocal en los canales de Atresmedia para generar más negocio." />
@@ -73,7 +63,7 @@ const filters = [
     <link rel="preload" href={`${base}/fonts/gothampro-bold.woff2`} as="font" type="font/woff2" crossorigin />
     <title>Casos de éxito | +CercaTV</title>
   </head>
-  <body>
+  <body class="page-wide">
     <Header />
 
     <main>
@@ -108,10 +98,10 @@ const filters = [
                 <div>
                   <span class="case-tile__category">{item.category}</span>
                   <h3 class="case-tile__title">{item.title}</h3>
-                  <p class="case-tile__subtitle">{item.subtitle}</p>
                 </div>
                 <div class="case-tile__logo case-tile__logo--placeholder" aria-hidden="true">Tu logo aquí</div>
               </div>
+              <p class="case-tile__subtitle">{item.subtitle}</p>
 
               <div class="case-tile__stat">
                 <strong data-prefix={item.prefix} data-value={item.value} data-suffix={item.suffix} data-decimals={item.decimals}>{item.prefix}{item.value.toFixed(item.decimals)}{item.suffix}</strong>
@@ -129,7 +119,6 @@ const filters = [
               </div>
 
               <div class="case-tile__footer">
-                <span>Televisión que genera resultados</span>
                 <a class="case-tile__link" href={`${base}/casos-de-exito/${item.slug}`}>
                   Ver caso completo
                   <span class="case-tile__link-icon" aria-hidden="true" set:html={arrowIcon} />

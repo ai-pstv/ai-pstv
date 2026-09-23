@@ -5,6 +5,7 @@ import '../../styles/tokens.css';
 import '../../styles/header.css';
 import '../../styles/footer.css';
 import Header from '../../components/Header.astro';
+import AuthGate from '../../components/AuthGate.astro';
 import Footer from '../../components/Footer.astro';
 
 export async function getStaticPaths() {
@@ -30,57 +31,81 @@ const chartIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <script is:inline>
-      (function () {
-        if (sessionStorage.getItem('cercatv-auth') === '1') return;
-        let ok = false;
-        while (!ok) {
-          const u = prompt('Usuario');
-          const p = prompt('Contraseña');
-          if (u === 'Cidoncha' && p === '007007') { sessionStorage.setItem('cercatv-auth', '1'); ok = true; }
-        }
-      })();
-    </script>
+    <AuthGate />
     <meta name="viewport" content="width=device-width" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="description" content={c.descripcion} />
     <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
     <link rel="preload" href={`${base}/fonts/gothampro-regular.woff2`} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={`${base}/fonts/gothampro-bold.woff2`} as="font" type="font/woff2" crossorigin />
+    {c.lat && c.lng && (
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="" />
+    )}
     <title>{c.titulo} · Caso de éxito | +CercaTV</title>
   </head>
-  <body>
+  <body class="page-wide">
     <Header />
     <main>
       <section class="case-story" aria-labelledby="case-story-title">
         <a class="case-story__back" href={`${base}/casos-de-exito`}>← Volver a casos de éxito</a>
 
-        <div class="case-story__head">
-          <span class="case-tile__badge">Caso de éxito · {c.index}</span>
-          <span class="case-story__category">{c.categoria}</span>
+        <div class="case-story__layout">
+          <div class="case-story__main">
+            <div class="case-story__head">
+              <span class="case-tile__badge">Caso de éxito · {c.index}</span>
+              <span class="case-story__category">{c.categoria}</span>
+            </div>
+
+            <h1 id="case-story-title">{c.titulo}</h1>
+            <p class="case-story__subtitle">{c.subtitulo}</p>
+            <p class="case-story__description">{c.descripcion}</p>
+
+            <div class="case-story__image">
+              <span class="case-story__image-tag">Creatividad emitida</span>
+              {c.imagen ? (
+                <img class="case-story__image-photo" src={`${base}/images/casos/${c.imagen}`} alt={`Creatividad de ${c.titulo} emitida en los canales de Atresmedia`} loading="lazy" />
+              ) : (
+                <span class="case-story__image-placeholder">Fotograma real de la creatividad emitida, pendiente de sustituir por la captura del anuncio.</span>
+              )}
+            </div>
+          </div>
+
+          <aside class="case-story__sidebar">
+            <div class="case-story__facts">
+              <div class="case-tile__meta-item"><span class="case-tile__meta-icon" aria-hidden="true" set:html={pinIcon} /><div><span>Ubicación</span><strong>{c.ubicacion}</strong></div></div>
+              <div class="case-tile__meta-item"><span class="case-tile__meta-icon" aria-hidden="true" set:html={productIcon} /><div><span>Producto</span><strong>{c.producto}</strong></div></div>
+              <div class="case-tile__meta-item"><span class="case-tile__meta-icon" aria-hidden="true" set:html={chartIcon} /><div><strong data-prefix={c.resultadoPrefijo} data-value={c.resultadoValor} data-suffix={c.resultadoSufijo} data-decimals={c.resultadoDecimales}>{resultadoTexto}</strong><span>{c.resultadoDescripcion}</span></div></div>
+            </div>
+
+            {c.lat && c.lng && (
+              <div class="case-story__map-block">
+                <span class="case-story__map-label">Zona de cobertura de la campaña</span>
+                <div id="case-map" class="case-story__map" data-lat={c.lat} data-lng={c.lng}></div>
+              </div>
+            )}
+
+            <a class="cta-pill case-story__cta" href={`${base}/#contacto`}>Quiero un caso como este</a>
+          </aside>
         </div>
-
-        <h1 id="case-story-title">{c.titulo}</h1>
-        <p class="case-story__subtitle">{c.subtitulo}</p>
-        <p class="case-story__description">{c.descripcion}</p>
-
-        <div class="case-story__image">
-          <span class="case-story__image-tag">Creatividad emitida</span>
-          <span class="case-story__image-placeholder">Fotograma real de la creatividad emitida, pendiente de sustituir por la captura del anuncio.</span>
-        </div>
-
-        <div class="case-story__facts">
-          <div class="case-tile__meta-item"><span class="case-tile__meta-icon" aria-hidden="true" set:html={pinIcon} /><div><span>Ubicación</span><strong>{c.ubicacion}</strong></div></div>
-          <div class="case-tile__meta-item"><span class="case-tile__meta-icon" aria-hidden="true" set:html={productIcon} /><div><span>Producto</span><strong>{c.producto}</strong></div></div>
-          <div class="case-tile__meta-item"><span class="case-tile__meta-icon" aria-hidden="true" set:html={chartIcon} /><div><strong data-prefix={c.resultadoPrefijo} data-value={c.resultadoValor} data-suffix={c.resultadoSufijo} data-decimals={c.resultadoDecimales}>{resultadoTexto}</strong><span>{c.resultadoDescripcion}</span></div></div>
-        </div>
-
-        <a class="cta-pill case-story__cta" href={`${base}/#contacto`}>Quiero un caso como este</a>
       </section>
     </main>
     <Footer />
 
+    {c.lat && c.lng && (
+      <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin=""></script>
+    )}
     <script>
+      const mapEl = document.getElementById('case-map');
+      if (mapEl && (window as any).L) {
+        const lat = Number(mapEl.dataset.lat);
+        const lng = Number(mapEl.dataset.lng);
+        const L = (window as any).L;
+        const map = L.map('case-map', { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, attributionControl: false }).setView([lat, lng], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+        L.circle([lat, lng], { radius: 5000, color: '#cb7721', fillColor: '#cb7721', fillOpacity: 0.12, weight: 2 }).addTo(map);
+        L.circleMarker([lat, lng], { radius: 7, color: '#cb7721', fillColor: '#cb7721', fillOpacity: 1, weight: 2 }).addTo(map);
+      }
+
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const el = document.querySelector<HTMLElement>('.case-story__facts strong[data-value]');
       if (el) {

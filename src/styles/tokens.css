@@ -63,7 +63,9 @@
   --radius-small: 10px;
   --radius-medium: 18px;
   --radius-pill: 999px;
-  --page-width: min(1280px, calc(100% - 48px));
+  --container-max: 1280px;
+  --content-width: 1150px;
+  --page-width: min(var(--container-max), calc(100% - 48px));
 
   /* Alias semánticos consumidos por los componentes actuales */
   --orange: var(--color-brand);
@@ -120,4 +122,13 @@ body[data-theme='dark'] .site-header__menu { color: var(--color-text); }
 
 @media (max-width: 620px) {
   :root { --page-width: calc(100% - 36px); }
+}
+
+/* Ancho ampliado y líquido (1440px): home (3 idiomas) y casos de éxito (archivo + fichas).
+   Reversible: basta con borrar este bloque (o quitar la clase "page-wide" del <body>)
+   para volver al ancho estándar de 1280/1150px del resto del sitio. */
+body.page-wide {
+  --container-max: 1440px;
+  --content-width: 1440px;
+  --page-width: min(var(--container-max), calc(100% - 48px));
 }

@@ -2,7 +2,7 @@
 index: "01"
 categoria: "Franquicias"
 categoriaSlug: "franquicias"
-titulo: "FitZone Franquicias"
+titulo: "FitZone"
 subtitulo: "Más personas. Más negocio."
 ubicacion: "Red de centros, cobertura nacional"
 producto: "Campaña de apertura de temporada"

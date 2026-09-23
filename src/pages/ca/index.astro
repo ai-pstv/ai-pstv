@@ -4,6 +4,7 @@ import '../../styles/tokens.css';
 import '../../styles/header.css';
 import '../../styles/footer.css';
 import Header from '../../components/Header.astro';
+import AuthGate from '../../components/AuthGate.astro';
 import Footer from '../../components/Footer.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -24,18 +25,7 @@ const organizationSchema = {
 <html lang="ca">
   <head>
     <meta charset="UTF-8" />
-    <script is:inline>
-      (function () {
-        return; // DESACTIVADO TEMPORALMENTE PARA PRUEBAS LOCALES: quitar esta línea para reactivar el acceso.
-        if (sessionStorage.getItem('cercatv-auth') === '1') return;
-        let ok = false;
-        while (!ok) {
-          const u = prompt('Usuario');
-          const p = prompt('Contraseña');
-          if (u === 'Cidoncha' && p === '007007') { sessionStorage.setItem('cercatv-auth', '1'); ok = true; }
-        }
-      })();
-    </script>
+    <AuthGate />
     <meta name="viewport" content="width=device-width" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="description" content="Publicitat en televisió hiperlocal als canals d'Atresmedia. Impacta als codis postals, barris o ciutats que t'interessen, sense necessitat de produir un espot." />
@@ -48,7 +38,7 @@ const organizationSchema = {
     <title>Publicitat en televisió hiperlocal als canals d'Atresmedia | +CercaTV</title>
     <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
   </head>
-  <body>
+  <body class="page-wide">
     <Header locale="ca" />
     <main>
       <section class="hero" id="overview" data-i18n-section="overview">
@@ -61,7 +51,6 @@ const organizationSchema = {
             <a class="hero__secondary-action" href="#process">Veure com funciona <span aria-hidden="true">→</span></a>
           </div>
         </div>
-        <div class="hero__signal" aria-hidden="true"><span></span><span></span><span></span></div>
       </section>
 
       <section class="benefits" id="benefits" aria-labelledby="benefits-title" data-i18n-section="benefits" data-reveal>

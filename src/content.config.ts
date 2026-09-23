@@ -19,6 +19,8 @@ const casos = defineCollection({
     progreso: z.number(),
     descripcion: z.string(),
     imagen: z.string().optional(),
+    lat: z.number().optional(),
+    lng: z.number().optional(),
     destacado: z.boolean().default(false),
   }),
 });

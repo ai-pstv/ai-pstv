@@ -6,9 +6,9 @@ interface Props {
 const { locale = 'es' } = Astro.props;
 
 const translations = {
-  es: { about: 'Quiénes somos', media: '+Cerca Media', exclusivity: 'Exclusividad con Atresmedia', solutions: 'Soluciones', cases: 'Casos de éxito', greeting: '', cta: 'Contactar', menu: 'Menú', close: 'Cerrar', navigation: 'Navegación', appearance: 'Apariencia', dark: 'Oscuro', light: 'Claro' },
-  en: { about: 'About us', media: '+Cerca Media', exclusivity: 'Exclusivity with Atresmedia', solutions: 'Solutions', cases: 'Success stories', greeting: '', cta: 'Contact', menu: 'Menu', close: 'Close', navigation: 'Navigation', appearance: 'Appearance', dark: 'Dark', light: 'Light' },
-  ca: { about: 'Qui som', media: '+Cerca Media', exclusivity: 'Exclusivitat amb Atresmedia', solutions: 'Solucions', cases: 'Casos d’èxit', greeting: '', cta: 'Contacta’ns', menu: 'Menú', close: 'Tanca', navigation: 'Navegació', appearance: 'Aparença', dark: 'Fosc', light: 'Clar' },
+  es: { about: 'Quiénes somos', media: '+Cerca Media', exclusivity: 'Exclusividad con Atresmedia', solutions: 'Soluciones', cases: 'Casos de éxito', greeting: '', cta: 'FAQ\'s', menu: 'Menú', close: 'Cerrar', navigation: 'Navegación', appearance: 'Apariencia', dark: 'Oscuro', light: 'Claro' },
+  en: { about: 'About us', media: '+Cerca Media', exclusivity: 'Exclusivity with Atresmedia', solutions: 'Solutions', cases: 'Success stories', greeting: '', cta: 'FAQs', menu: 'Menu', close: 'Close', navigation: 'Navigation', appearance: 'Appearance', dark: 'Dark', light: 'Light' },
+  ca: { about: 'Qui som', media: '+Cerca Media', exclusivity: 'Exclusivitat amb Atresmedia', solutions: 'Solucions', cases: 'Casos d’èxit', greeting: '', cta: 'FAQ\'s', menu: 'Menú', close: 'Tanca', navigation: 'Navegació', appearance: 'Aparença', dark: 'Fosc', light: 'Clar' },
 };
 
 const translation = translations[locale];
@@ -71,16 +71,36 @@ const homeHref = path(locale === 'es' ? '/' : `/${locale}/`);
     </nav>
 
     <div class="site-header__actions">
-      <button class="theme-switcher" type="button" data-theme-toggle data-dark-label={translation.dark} data-light-label={translation.light} aria-pressed="false">{translation.dark}</button>
-      <div class="language-switcher" aria-label="Seleccionar idioma">
-        {languages.map((lang, index) => (
-          <>
-            {index > 0 && <span aria-hidden="true"></span>}
-            <a href={lang.href} data-language-link aria-current={locale === lang.code ? 'true' : undefined}>{lang.shortLabel}</a>
-          </>
-        ))}
+      <button class="theme-switcher" type="button" data-theme-toggle data-dark-label={translation.dark} data-light-label={translation.light} aria-pressed="false">
+        <svg class="theme-switcher__icon theme-switcher__icon--moon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
+        </svg>
+        <svg class="theme-switcher__icon theme-switcher__icon--sun" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4 12H2M22 12h-2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+        </svg>
+        <span class="theme-switcher__label">{translation.dark}</span>
+      </button>
+      <div class="language-menu-wrap" id="language-menu-wrap" data-language-menu>
+        <button class="language-menu-trigger" type="button" aria-label="Cambiar idioma" aria-expanded="false" aria-controls="language-menu-panel">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8"></circle>
+            <path d="M4 12h16"></path>
+            <path d="M12 4c2.1 2.2 3.1 4.9 3.1 8s-1 5.8-3.1 8"></path>
+            <path d="M12 4c-2.1 2.2-3.1 4.9-3.1 8s1 5.8 3.1 8"></path>
+          </svg>
+          <span class="language-menu-current">{locale.toUpperCase()}</span>
+        </button>
+        <div class="language-menu-panel" id="language-menu-panel" role="menu" aria-label="Idioma">
+          {languages.map((lang) => (
+            <a href={lang.href} data-language-link role="menuitem" aria-current={locale === lang.code ? 'true' : undefined}>
+              <span>{lang.longLabel}</span>
+              <span class="language-menu-code">{lang.shortLabel}</span>
+            </a>
+          ))}
+        </div>
       </div>
-      <a class="site-header__cta" href={path('/contacto')}>{translation.cta}</a>
+      <a class="site-header__cta" href={path('/preguntas-frecuentes')}>{translation.cta}</a>
       <button class="site-header__menu" type="button" aria-expanded="false" aria-controls="mobile-navigation">{translation.menu}</button>
     </div>
   </div>
@@ -96,14 +116,23 @@ const homeHref = path(locale === 'es' ? '/' : `/${locale}/`);
     <div class="mobile-navigation__bottom">
       <div class="mobile-theme-control">
         <span>{translation.appearance}</span>
-        <button class="theme-switcher theme-switcher--mobile" type="button" data-theme-toggle data-dark-label={translation.dark} data-light-label={translation.light} aria-pressed="false">{translation.dark}</button>
+        <button class="theme-switcher theme-switcher--mobile" type="button" data-theme-toggle data-dark-label={translation.dark} data-light-label={translation.light} aria-pressed="false">
+          <svg class="theme-switcher__icon theme-switcher__icon--moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
+          </svg>
+          <svg class="theme-switcher__icon theme-switcher__icon--sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4 12H2M22 12h-2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+          </svg>
+          <span class="theme-switcher__label">{translation.dark}</span>
+        </button>
       </div>
       <div class="language-switcher language-switcher--mobile" aria-label="Seleccionar idioma">
         {languages.map((lang) => (
           <a href={lang.href} data-language-link data-mobile-language-link aria-current={locale === lang.code ? 'true' : undefined}>{lang.longLabel}</a>
         ))}
       </div>
-      <a class="site-header__cta site-header__cta--mobile" href={path('/contacto')}>{translation.cta}</a>
+      <a class="site-header__cta site-header__cta--mobile" href={path('/preguntas-frecuentes')}>{translation.cta}</a>
     </div>
   </div>
 </header>
@@ -141,7 +170,10 @@ const homeHref = path(locale === 'es' ? '/' : `/${locale}/`);
     document.body.dataset.theme = theme;
     themeButtons.forEach((button) => {
       button.setAttribute('aria-pressed', String(theme === 'dark'));
-      button.textContent = theme === 'dark' ? button.dataset.lightLabel ?? 'Claro' : button.dataset.darkLabel ?? 'Oscuro';
+      const label = button.querySelector<HTMLElement>('.theme-switcher__label');
+      const labelText = theme === 'dark' ? button.dataset.lightLabel ?? 'Claro' : button.dataset.darkLabel ?? 'Oscuro';
+      if (label) label.textContent = labelText;
+      else button.textContent = labelText;
     });
     const base = header?.dataset.base ?? '';
     if (logo) logo.src = theme === 'dark' ? `${base}/images/brand/cercatv-logo-dark.svg` : `${base}/images/brand/cercatv-logo-color.svg`;
@@ -150,6 +182,26 @@ const homeHref = path(locale === 'es' ? '/' : `/${locale}/`);
   const savedTheme = localStorage.getItem('cercatv-theme');
   if (savedTheme === 'dark') setTheme('dark');
   themeButtons.forEach((button) => button.addEventListener('click', () => setTheme(document.body.dataset.theme === 'dark' ? 'clear' : 'dark')));
+
+  const languageMenuWrap = header?.querySelector<HTMLElement>('[data-language-menu]');
+  const languageMenuTrigger = languageMenuWrap?.querySelector<HTMLButtonElement>('.language-menu-trigger');
+  const closeLanguageMenu = () => {
+    if (!languageMenuWrap || !languageMenuTrigger) return;
+    languageMenuWrap.classList.remove('is-open');
+    languageMenuTrigger.setAttribute('aria-expanded', 'false');
+  };
+  languageMenuTrigger?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const opening = !languageMenuWrap?.classList.contains('is-open');
+    languageMenuWrap?.classList.toggle('is-open', opening);
+    languageMenuTrigger.setAttribute('aria-expanded', String(opening));
+  });
+  document.addEventListener('click', (event) => {
+    if (languageMenuWrap && !languageMenuWrap.contains(event.target as Node)) closeLanguageMenu();
+  });
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeLanguageMenu();
+  });
 
   header?.querySelectorAll<HTMLAnchorElement>('[data-language-link]').forEach((link) => {
     link.addEventListener('click', (event) => {
