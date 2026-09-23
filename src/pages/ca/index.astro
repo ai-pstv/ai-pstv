@@ -5,9 +5,23 @@ import '../../styles/header.css';
 import '../../styles/footer.css';
 import Header from '../../components/Header.astro';
 import AuthGate from '../../components/AuthGate.astro';
+import HeroMapFlow from '../../components/HeroMapFlow.astro';
 import Footer from '../../components/Footer.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// PROVA REVERSIBLE: hero amb panell animat (mapa de Barcelona) a la dreta i text a l'esquerra. Posar a false per tornar al hero centrat original.
+const HERO_FLOW_TEST = true;
+// Traducció automàtica de referència, pendent de revisió humana.
+const heroFlowCopy = {
+  bar: 'cercatv · campanya activa',
+  steps: ['Preparant el teu anunci…', 'Segmentant per {zona}…', "Emetent als canals d'Atresmedia…", 'Arribant a la teva audiència real'],
+  cards: [
+    { title: 'El teu anunci', text: 'Creem el teu espot o adaptem el que ja tens.' },
+    { title: 'Segmentació', text: "L'emetem només a Barcelona ({zona})." },
+    { title: 'Emissió a TV', text: "El teu anunci es mostra als canals d'Atresmedia només en aquest districte." },
+    { title: 'La teva audiència real', text: 'Arribes a les persones que viuen o es mouen a {zona}.' },
+  ],
+};
 // Dominio de pruebas actual; confirmar dominio definitivo antes de quitar el noindex.
 const siteOrigin = 'https://publicidadsegmentadatv.com';
 
@@ -38,10 +52,11 @@ const organizationSchema = {
     <title>Publicitat en televisió hiperlocal als canals d'Atresmedia | +CercaTV</title>
     <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
   </head>
-  <body class="page-wide">
+  <body class:list={['page-wide', HERO_FLOW_TEST && 'hero-flow-test']}>
     <Header locale="ca" />
     <main>
       <section class="hero" id="overview" data-i18n-section="overview">
+        {HERO_FLOW_TEST && <HeroMapFlow map="mapa-barcelona" city="BARCELONA" zoneSlugs={['eixample', 'gracia', 'sarria-sant-gervasi', 'sant-marti']} copy={heroFlowCopy} />}
         <div class="hero__content">
           <div class="eyebrow">Televisió hiperlocal · als canals d'Atresmedia</div>
           <h1><span>Fes publicitat a la televisió</span><span>només on genera negoci</span></h1>

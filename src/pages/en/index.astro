@@ -5,9 +5,22 @@ import '../../styles/header.css';
 import '../../styles/footer.css';
 import Header from '../../components/Header.astro';
 import AuthGate from '../../components/AuthGate.astro';
+import HeroMapFlow from '../../components/HeroMapFlow.astro';
 import Footer from '../../components/Footer.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// REVERSIBLE TEST: hero with animated panel (Málaga map) on the right and text on the left. Set to false to go back to the original centred hero.
+const HERO_FLOW_TEST = true;
+const heroFlowCopy = {
+  bar: 'cercatv · active campaign',
+  steps: ['Preparing your ad…', 'Targeting {zona}…', 'Airing on Atresmedia channels…', 'Reaching your real audience'],
+  cards: [
+    { title: 'Your ad', text: 'We create your spot or adapt the one you already have.' },
+    { title: 'Targeting', text: 'We air it only in Málaga ({zona}).' },
+    { title: 'TV broadcast', text: 'Your ad appears on Atresmedia channels only in that district.' },
+    { title: 'Your real audience', text: 'You reach the people who live or move around {zona}.' },
+  ],
+};
 // Dominio de pruebas actual; confirmar dominio definitivo antes de quitar el noindex.
 const siteOrigin = 'https://publicidadsegmentadatv.com';
 
@@ -38,10 +51,11 @@ const organizationSchema = {
     <title>Hyperlocal TV advertising | +CercaTV</title>
     <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
   </head>
-  <body class="page-wide">
+  <body class:list={['page-wide', HERO_FLOW_TEST && 'hero-flow-test']}>
     <Header locale="en" />
     <main>
       <section class="hero" id="overview" data-i18n-section="overview">
+        {HERO_FLOW_TEST && <HeroMapFlow map="mapa-malaga" city="MÁLAGA" zoneSlugs={['centro', 'este', 'teatinos-universidad', 'carretera-de-cadiz']} copy={heroFlowCopy} />}
         <div class="hero__content">
           <div class="eyebrow">Hyperlocal television · on Atresmedia channels</div>
           <h1><span>Make TV advertising work</span><span>where it drives business</span></h1>

@@ -254,8 +254,8 @@
 
 /* PRUEBA REVERSIBLE (home): texto a la izquierda + panel animado a la derecha. Solo aplica con body.hero-flow-test. */
 body.hero-flow-test .hero__content { max-width: none; width: 53%; margin: 0; text-align: left; }
-body.hero-flow-test .hero h1 { max-width: none; margin: 23px 0 30px; font-size: clamp(3rem, 5.8vw, 6rem); line-height: 1.02; }
-body.hero-flow-test .hero__content > p { max-width: 640px; margin: 0; font-size: clamp(1.2rem, 1.7vw, 1.55rem); }
+body.hero-flow-test .hero h1 { max-width: none; margin: 23px 0 30px; font-size: clamp(2.8rem, 5vw, 5.2rem); line-height: 1.04; }
+body.hero-flow-test .hero__content > p { max-width: 620px; margin: 0; font-size: clamp(1.1rem, 1.5vw, 1.4rem); }
 body.hero-flow-test .hero .eyebrow { font-size: clamp(.85rem, 1vw, 1rem); }
 body.hero-flow-test .hero__actions { justify-content: flex-start; margin-top: 44px; }
 body.hero-flow-test .hero__primary-action { min-height: 60px; padding: 0 38px; font-size: 1.1rem; }

@@ -4,7 +4,30 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const svgSource = fs.readFileSync(path.join(process.cwd(), 'public/images/hero/mapa-madrid.svg'), 'utf-8');
+interface Copy {
+  bar: string;
+  steps: string[];
+  cards: { title: string; text: string }[];
+}
+interface Props {
+  map?: string;
+  city?: string;
+  zoneSlugs?: string[];
+  copy?: Copy;
+}
+const defaultCopy: Copy = {
+  bar: 'cercatv · campaña activa',
+  steps: ['Preparando tu anuncio…', 'Segmentando por {zona}…', 'Emitiendo en los canales de Atresmedia…', 'Llegando a tu audiencia real'],
+  cards: [
+    { title: 'Tu anuncio', text: 'Creamos tu spot o adaptamos el que ya tienes.' },
+    { title: 'Segmentación', text: 'Lo emitimos solo en Madrid ({zona}).' },
+    { title: 'Emisión en TV', text: 'Tu anuncio se muestra en los canales de Atresmedia solo en ese distrito.' },
+    { title: 'Tu audiencia real', text: 'Llegas a las personas que viven o se mueven en {zona}.' },
+  ],
+};
+const { map = 'mapa-madrid', city = 'MADRID', zoneSlugs = ['chamberi', 'fuencarral-el-pardo', 'salamanca', 'moncloa-aravaca'], copy = defaultCopy } = Astro.props;
+
+const svgSource = fs.readFileSync(path.join(process.cwd(), `public/images/hero/${map}.svg`), 'utf-8');
 const viewBox = svgSource.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/)!;
 const mapW = parseFloat(viewBox[1]);
 const mapH = parseFloat(viewBox[2]);
@@ -17,15 +40,11 @@ const districts = [...svgSource.matchAll(/<path id="([a-z-]+)" class="distrito" 
 });
 
 // Zonas de ejemplo (marcador de posición): cualquiera de los 21 ids del mapa.
-const zoneList = [{ slug: 'chamberi' }, { slug: 'fuencarral-el-pardo' }, { slug: 'salamanca' }, { slug: 'moncloa-aravaca' }];
+const zoneList = zoneSlugs.map((slug) => ({ slug }));
 
 // Mensajes de la terminal, uno por paso (salen al pasar el pulso por cada tarjeta).
-const steps = [
-  { at: 0, text: 'Preparando tu anuncio…' },
-  { at: 900, text: 'Segmentando por {zona}…' },
-  { at: 2700, text: 'Emitiendo en los canales de Atresmedia…' },
-  { at: 3600, text: 'Llegando a tu audiencia real' },
-];
+const stepTimes = [0, 900, 2700, 3600];
+const steps = copy.steps.map((text, i) => ({ at: stepTimes[i], text }));
 
 // Colocación en un lienzo de 640 x 540 unidades.
 const W = 640, H = 540;
@@ -43,18 +62,15 @@ const icons = {
   tv: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 3l4 3 4-3"/>',
   users: '<circle cx="9" cy="8" r="3.2"/><path d="M2.8 19a6.2 6.2 0 0 1 12.4 0"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.5 13.2a5 5 0 0 1 5.7 5.8"/>',
 };
-const cards = [
-  { n: '01', icon: icons.play, title: 'Tu anuncio', text: 'Creamos tu spot o adaptamos el que ya tienes.', pos: box(0, 10, 230, 104) },
-  { n: '02', icon: icons.pin, title: 'Segmentación', text: 'Lo emitimos solo en Madrid ({zona}).', pos: box(0, 150, 196, 104) },
-  { n: '03', icon: icons.tv, title: 'Emisión en TV', text: 'Tu anuncio se muestra en los canales de Atresmedia solo en ese distrito.', pos: box(410, 30, 230, 116) },
-  { n: '04', icon: icons.users, title: 'Tu audiencia real', text: 'Llegas a las personas que viven o se mueven en {zona}.', pos: box(410, 262, 230, 104) },
-];
+const cardIcons = [icons.play, icons.pin, icons.tv, icons.users];
+const cardPos = [box(0, 10, 230, 104), box(0, 150, 196, 104), box(410, 30, 230, 116), box(410, 262, 230, 104)];
+const cards = copy.cards.map((c, i) => ({ n: `0${i + 1}`, icon: cardIcons[i], title: c.title, text: c.text, pos: cardPos[i] }));
 ---
 <div class="hmf" aria-hidden="true" data-hmf data-zones={JSON.stringify(zones)}>
   <svg class="hmf__map" viewBox={`0 0 ${mapW} ${mapH}`} style={box(MAP.x, MAP.y, MAP.w, MAP.h)}>
     {districts.map((d, i) => <path id={d.id} class={`distrito${i === 0 ? '' : ''}`} d={d.d} style={`--i:${i}`} />)}
   </svg>
-  <span class="hmf__label" style={box(MAP.x, MAP.y - 6, MAP.w, 20)}>MADRID</span>
+  <span class="hmf__label" style={box(MAP.x, MAP.y - 6, MAP.w, 20)}>{city}</span>
   <span class="hmf__chip" data-chip><span data-zona>{zones[0].name}</span></span>
 
   <svg class="hmf__wires" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none">
@@ -85,7 +101,7 @@ const cards = [
   ))}
 
   <div class="hmf__log" style={box(0, 338, 400, 150)} data-steps={JSON.stringify(steps)}>
-    <div class="hmf__log-bar"><i></i><i></i><i></i><span>cercatv · campaña activa</span></div>
+    <div class="hmf__log-bar"><i></i><i></i><i></i><span>{copy.bar}</span></div>
     <ul>{steps.map(() => <li><span class="prompt">&gt;</span><span class="msg"></span></li>)}</ul>
   </div>
 
@@ -104,7 +120,17 @@ const cards = [
   .hmf__map { overflow: visible; }
   .hmf__map .distrito { fill: #143462; transition: fill .6s ease, filter .6s ease, transform .6s ease; transform-box: fill-box; transform-origin: center; animation: hmf-piece .7s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i) * 45ms); }
   .hmf__map .distrito:nth-child(odd) { fill: #17396b; }
-  .hmf__map .distrito.is-active { fill: #e58a1f; filter: drop-shadow(0 0 7px rgb(255 154 46 / 85%)); transform: scale(1.06); }
+  .hmf__map .distrito.is-active { fill: #e58a1f; filter: drop-shadow(0 0 7px rgb(255 154 46 / 85%)); transform: scale(1.06); animation: hmf-zone-blink 1.5s linear 0s 1 both; }
+  /* Parpadea 3 veces al ser elegida y se queda encendida */
+  @keyframes hmf-zone-blink {
+    0%   { fill: #143462; filter: none; }
+    10%  { fill: #ffb35c; filter: drop-shadow(0 0 12px rgb(255 170 70 / 100%)); }
+    22%  { fill: #143462; filter: none; }
+    34%  { fill: #ffb35c; filter: drop-shadow(0 0 12px rgb(255 170 70 / 100%)); }
+    46%  { fill: #143462; filter: none; }
+    58%  { fill: #ffb35c; filter: drop-shadow(0 0 12px rgb(255 170 70 / 100%)); }
+    100% { fill: #e58a1f; filter: drop-shadow(0 0 7px rgb(255 154 46 / 85%)); }
+  }
   @keyframes hmf-piece { from { opacity: 0; transform: scale(.85) translateY(10px); } to { opacity: 1; transform: none; } }
   .hmf__label { text-align: center; color: #5aa9ff; font-size: .72rem; font-weight: 700; letter-spacing: .28em; }
   .hmf__chip { z-index: 2; padding: 3px 12px; border: 1px solid rgb(255 194 122 / 70%); border-radius: 999px; color: #fff; background: #1c1517; font-size: .7rem; font-weight: 700; transform: translate(-50%, -190%); white-space: nowrap; box-shadow: 0 0 14px rgb(229 138 31 / 35%); transition: left .5s ease, top .5s ease; }
