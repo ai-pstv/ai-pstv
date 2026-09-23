@@ -5,6 +5,7 @@ import '../styles/header.css';
 import '../styles/footer.css';
 import Header from '../components/Header.astro';
 import AuthGate from '../components/AuthGate.astro';
+import FlowPanel from '../components/FlowPanel.astro';
 import Footer from '../components/Footer.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -27,26 +28,6 @@ const icons: Record<string, string> = {
   scale: '<path d="M12 3v18M6 7h12M4 7l3 6a3 3 0 0 0 6 0L10 7M14 7l3 6a3 3 0 0 0 6 0l-3-6"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
 };
-
-// Secuencia del hero: los iconos y cables son fijos, solo rotan estos textos (uno por nodo).
-const flowSlides = [
-  { tag: 'Segmentación geográfica', log: 'Segmentando por código postal…', nodes: ['Negocio local', 'Código postal', 'Canales Atresmedia', 'Más visitas'] },
-  { tag: 'Segmentación de audiencia', log: 'Afinando el perfil de audiencia…', nodes: ['Tu cliente ideal', 'Perfil de audiencia', 'Franja horaria', 'Más relevancia'] },
-  { tag: 'HbbTV y tecnología', log: 'Activando TV conectada en tu zona…', nodes: ['Tu anuncio', 'TV conectada', 'Solo tu zona', 'Sin desperdicio'] },
-  { tag: 'Medición y resultados', log: 'Midiendo resultados de negocio…', nodes: ['Tu objetivo', 'Campaña activa', 'Seguimiento', 'Resultados reales'] },
-];
-const flowIcons = [
-  '<path d="M4 9l1.5-5h13L20 9"/><path d="M5 9v11h14V9"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9"/>',
-  '<path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
-  '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 3l4 3 4-3"/>',
-  '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
-];
-const flowPos = [
-  { left: '0%', top: '55%' },
-  { left: '25.93%', top: '10%' },
-  { left: '51.85%', top: '55%' },
-  { left: '77.78%', top: '10%' },
-];
 
 const categories = [
   { id: 'todo', label: 'Todo', icon: 'all', tagline: '' },
@@ -137,35 +118,7 @@ const breadcrumbSchema = {
     <Header />
     <main>
       <section class="faqs-hero">
-        <div class="faqs-flow" aria-hidden="true">
-          <div class="faqs-flow__bar"><i></i><i></i><i></i><span id="faqs-flow-tag">{flowSlides[0].tag}</span></div>
-          <div class="faqs-flow__stage">
-            <svg viewBox="0 0 540 200" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="faqs-wire-grad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#e9a04f" />
-                  <stop offset="100%" stop-color="#cb7721" />
-                </linearGradient>
-              </defs>
-              <path class="wire" d="M120 142 C135 142 125 52 140 52" />
-              <path class="wire-run run-1" pathLength="100" d="M120 142 C135 142 125 52 140 52" />
-              <path class="wire" d="M260 52 C275 52 265 142 280 142" />
-              <path class="wire-run run-2" pathLength="100" d="M260 52 C275 52 265 142 280 142" />
-              <path class="wire" d="M400 142 C415 142 405 52 420 52" />
-              <path class="wire-run run-3" pathLength="100" d="M400 142 C415 142 405 52 420 52" />
-            </svg>
-            {flowSlides[0].nodes.map((text, i) => (
-              <div class={`faqs-flow__node n-${i + 1}`} style={`left:${flowPos[i].left};top:${flowPos[i].top}`}>
-                <span class="faqs-flow__icon"><svg viewBox="0 0 24 24" set:html={flowIcons[i]} /></span>
-                <span class="faqs-flow__copy">
-                  <span class="faqs-flow__step">0{i + 1}</span>
-                  <span class="faqs-flow__text" data-flow-text>{text}</span>
-                </span>
-              </div>
-            ))}
-          </div>
-          <div class="faqs-flow__log"><span class="prompt">&gt;</span><span id="faqs-flow-log">{flowSlides[0].log}</span><span class="cursor"></span></div>
-        </div>
+        <FlowPanel />
         <nav class="faqs-breadcrumb" aria-label="Ruta de navegación"><a href={`${base}/`}>Inicio</a><span>/</span><span>Preguntas frecuentes</span></nav>
         <h1>Preguntas frecuentes</h1>
         <p>Aquí encontrarás respuestas a las dudas más habituales sobre publicidad segmentada en televisión.</p>
@@ -222,7 +175,7 @@ const breadcrumbSchema = {
     </main>
     <Footer />
 
-    <script define:vars={{ categories, flowSlides }}>
+    <script define:vars={{ categories }}>
       const items = [...document.querySelectorAll('.faq-item')];
       const catButtons = [...document.querySelectorAll('.faqs-cat')];
       const titleEl = document.getElementById('faqs-content-title');
@@ -278,41 +231,6 @@ const breadcrumbSchema = {
       });
 
       render();
-
-      // Hero: rota solo los textos de la secuencia (iconos y cables se mantienen).
-      const flowTexts = [...document.querySelectorAll('[data-flow-text]')];
-      const flowTag = document.getElementById('faqs-flow-tag');
-      const flowLog = document.getElementById('faqs-flow-log');
-      if (flowTexts.length) {
-        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        let typing = 0;
-        const typeLog = (text) => {
-          clearInterval(typing);
-          if (reduced) { flowLog.textContent = text; return; }
-          let i = 0;
-          flowLog.textContent = '';
-          typing = setInterval(() => {
-            i += 1;
-            flowLog.textContent = text.slice(0, i);
-            if (i >= text.length) clearInterval(typing);
-          }, 38);
-        };
-        typeLog(flowSlides[0].log);
-        if (!reduced) {
-          let slide = 0;
-          setInterval(() => {
-            slide = (slide + 1) % flowSlides.length;
-            flowTexts.forEach((el) => el.classList.add('is-out'));
-            flowTag.classList.add('is-out');
-            setTimeout(() => {
-              flowTexts.forEach((el, i) => { el.textContent = flowSlides[slide].nodes[i]; el.classList.remove('is-out'); });
-              flowTag.textContent = flowSlides[slide].tag;
-              flowTag.classList.remove('is-out');
-              typeLog(flowSlides[slide].log);
-            }, 380);
-          }, 4800);
-        }
-      }
     </script>
   </body>
 </html>

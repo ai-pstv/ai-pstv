@@ -1,0 +1,90 @@
+---
+// Panel animado (ventana de app): iconos y cables fijos, solo rotan los textos de cada secuencia.
+const slides = [
+  { tag: 'Segmentación geográfica', log: 'Segmentando por código postal…', nodes: ['Negocio local', 'Código postal', 'Canales Atresmedia', 'Más visitas'] },
+  { tag: 'Segmentación de audiencia', log: 'Afinando el perfil de audiencia…', nodes: ['Tu cliente ideal', 'Perfil de audiencia', 'Franja horaria', 'Más relevancia'] },
+  { tag: 'HbbTV y tecnología', log: 'Activando TV conectada en tu zona…', nodes: ['Tu anuncio', 'TV conectada', 'Solo tu zona', 'Sin desperdicio'] },
+  { tag: 'Medición y resultados', log: 'Midiendo resultados de negocio…', nodes: ['Tu objetivo', 'Campaña activa', 'Seguimiento', 'Resultados reales'] },
+];
+const icons = [
+  '<path d="M4 9l1.5-5h13L20 9"/><path d="M5 9v11h14V9"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9"/>',
+  '<path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+  '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 3l4 3 4-3"/>',
+  '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+];
+const positions = [
+  { left: '0%', top: '55%' },
+  { left: '25.93%', top: '10%' },
+  { left: '51.85%', top: '55%' },
+  { left: '77.78%', top: '10%' },
+];
+---
+<div class="flow-panel" aria-hidden="true" data-flow-panel data-slides={JSON.stringify(slides)}>
+  <div class="flow-panel__bar"><i></i><i></i><i></i><span data-flow-tag>{slides[0].tag}</span></div>
+  <div class="flow-panel__stage">
+    <svg viewBox="0 0 540 200" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="flow-wire-grad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#e9a04f" />
+          <stop offset="100%" stop-color="#cb7721" />
+        </linearGradient>
+      </defs>
+      <path class="wire" d="M120 142 C135 142 125 52 140 52" />
+      <path class="wire-run run-1" pathLength="100" d="M120 142 C135 142 125 52 140 52" />
+      <path class="wire" d="M260 52 C275 52 265 142 280 142" />
+      <path class="wire-run run-2" pathLength="100" d="M260 52 C275 52 265 142 280 142" />
+      <path class="wire" d="M400 142 C415 142 405 52 420 52" />
+      <path class="wire-run run-3" pathLength="100" d="M400 142 C415 142 405 52 420 52" />
+    </svg>
+    {slides[0].nodes.map((text, i) => (
+      <div class={`flow-panel__node n-${i + 1}`} style={`left:${positions[i].left};top:${positions[i].top}`}>
+        <span class="flow-panel__icon"><svg viewBox="0 0 24 24" set:html={icons[i]} /></span>
+        <span class="flow-panel__copy">
+          <span class="flow-panel__step">0{i + 1}</span>
+          <span class="flow-panel__text" data-flow-text>{text}</span>
+        </span>
+      </div>
+    ))}
+  </div>
+  <div class="flow-panel__log"><span class="prompt">&gt;</span><span data-flow-log>{slides[0].log}</span><span class="cursor"></span></div>
+</div>
+
+<script>
+  const panel = document.querySelector<HTMLElement>('[data-flow-panel]');
+  if (panel) {
+    const slides: { tag: string; log: string; nodes: string[] }[] = JSON.parse(panel.dataset.slides ?? '[]');
+    const texts = [...panel.querySelectorAll<HTMLElement>('[data-flow-text]')];
+    const tag = panel.querySelector<HTMLElement>('[data-flow-tag]')!;
+    const log = panel.querySelector<HTMLElement>('[data-flow-log]')!;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let typing = 0;
+
+    const typeLog = (text: string) => {
+      clearInterval(typing);
+      if (reduced) { log.textContent = text; return; }
+      let i = 0;
+      log.textContent = '';
+      typing = window.setInterval(() => {
+        i += 1;
+        log.textContent = text.slice(0, i);
+        if (i >= text.length) clearInterval(typing);
+      }, 38);
+    };
+
+    typeLog(slides[0].log);
+    if (!reduced) {
+      let slide = 0;
+      setInterval(() => {
+        slide = (slide + 1) % slides.length;
+        texts.forEach((el) => el.classList.add('is-out'));
+        tag.classList.add('is-out');
+        setTimeout(() => {
+          texts.forEach((el, i) => { el.textContent = slides[slide].nodes[i]; el.classList.remove('is-out'); });
+          tag.textContent = slides[slide].tag;
+          tag.classList.remove('is-out');
+          typeLog(slides[slide].log);
+        }, 380);
+      }, 4800);
+    }
+  }
+</script>

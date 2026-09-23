@@ -5,9 +5,12 @@ import '../styles/header.css';
 import '../styles/footer.css';
 import Header from '../components/Header.astro';
 import AuthGate from '../components/AuthGate.astro';
+import HeroMapFlow from '../components/HeroMapFlow.astro';
 import Footer from '../components/Footer.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// PRUEBA REVERSIBLE: hero con panel animado a la derecha y texto a la izquierda. Poner en false para volver al hero centrado original.
+const HERO_FLOW_TEST = true;
 // Dominio de pruebas actual; confirmar dominio definitivo antes de quitar el noindex.
 const siteOrigin = 'https://publicidadsegmentadatv.com';
 
@@ -38,11 +41,12 @@ const organizationSchema = {
     <title>Publicidad en televisión hiperlocal en los canales de Atresmedia | +CercaTV</title>
     <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
   </head>
-  <body class="page-wide">
+  <body class:list={['page-wide', HERO_FLOW_TEST && 'hero-flow-test']}>
     <Header />
 
     <main>
       <section class="hero" id="overview" data-i18n-section="overview">
+        {HERO_FLOW_TEST && <HeroMapFlow />}
         <div class="hero__content">
           <div class="eyebrow">Televisión hiperlocal · en los canales de Atresmedia</div>
           <h1><span>Haz publicidad en televisión</span><span>solo donde genera negocio</span></h1>

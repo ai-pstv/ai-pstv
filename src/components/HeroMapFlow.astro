@@ -1,0 +1,244 @@
+---
+// Hero animado: 4 pasos conectados + mapa de distritos de Madrid + tele + audiencia.
+// Iconos, cables y tarjetas son fijos; cambian la zona iluminada y los textos que la mencionan.
+import fs from 'node:fs';
+import path from 'node:path';
+
+const svgSource = fs.readFileSync(path.join(process.cwd(), 'public/images/hero/mapa-madrid.svg'), 'utf-8');
+const viewBox = svgSource.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/)!;
+const mapW = parseFloat(viewBox[1]);
+const mapH = parseFloat(viewBox[2]);
+const districts = [...svgSource.matchAll(/<path id="([a-z-]+)" class="distrito" data-nombre="([^"]*)" d="([^"]*)"/g)].map((m) => {
+  const nums = (m[3].match(/-?\d+\.?\d*/g) ?? []).map(Number);
+  const xs = nums.filter((_, i) => i % 2 === 0);
+  const ys = nums.filter((_, i) => i % 2 === 1);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  return { id: m[1], name: m[2], d: m[3], minX, maxX, minY, maxY, cx: (minX + maxX) / 2, cy: (minY + maxY) / 2 };
+});
+
+// Zonas de ejemplo (marcador de posición): cualquiera de los 21 ids del mapa.
+const zoneList = [{ slug: 'chamberi' }, { slug: 'fuencarral-el-pardo' }, { slug: 'salamanca' }, { slug: 'moncloa-aravaca' }];
+
+// Mensajes de la terminal, uno por paso (salen al pasar el pulso por cada tarjeta).
+const steps = [
+  { at: 0, text: 'Preparando tu anuncio…' },
+  { at: 900, text: 'Segmentando por {zona}…' },
+  { at: 2700, text: 'Emitiendo en los canales de Atresmedia…' },
+  { at: 3600, text: 'Llegando a tu audiencia real' },
+];
+
+// Colocación en un lienzo de 640 x 540 unidades.
+const W = 640, H = 540;
+const MAP = { x: 210, y: 60, w: 220, h: (220 * mapH) / mapW };
+const k = MAP.w / mapW;
+const zones = zoneList.map((z) => {
+  const d = districts.find((x) => x.id === z.slug)!;
+  return { slug: z.slug, name: d.name, cx: +(MAP.x + d.cx * k).toFixed(1), cy: +(MAP.y + d.cy * k).toFixed(1) };
+});
+const box = (x: number, y: number, w: number, h: number) => `left:${(x / W) * 100}%;top:${(y / H) * 100}%;width:${(w / W) * 100}%;height:${(h / H) * 100}%`;
+
+const icons = {
+  play: '<circle cx="12" cy="12" r="10"/><path d="M10 8.5v7l6-3.5z" fill="currentColor"/>',
+  pin: '<path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5" fill="currentColor"/>',
+  tv: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 3l4 3 4-3"/>',
+  users: '<circle cx="9" cy="8" r="3.2"/><path d="M2.8 19a6.2 6.2 0 0 1 12.4 0"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.5 13.2a5 5 0 0 1 5.7 5.8"/>',
+};
+const cards = [
+  { n: '01', icon: icons.play, title: 'Tu anuncio', text: 'Creamos tu spot o adaptamos el que ya tienes.', pos: box(0, 10, 230, 104) },
+  { n: '02', icon: icons.pin, title: 'Segmentación', text: 'Lo emitimos solo en Madrid ({zona}).', pos: box(0, 150, 196, 104) },
+  { n: '03', icon: icons.tv, title: 'Emisión en TV', text: 'Tu anuncio se muestra en los canales de Atresmedia solo en ese distrito.', pos: box(410, 30, 230, 116) },
+  { n: '04', icon: icons.users, title: 'Tu audiencia real', text: 'Llegas a las personas que viven o se mueven en {zona}.', pos: box(410, 262, 230, 104) },
+];
+---
+<div class="hmf" aria-hidden="true" data-hmf data-zones={JSON.stringify(zones)}>
+  <svg class="hmf__map" viewBox={`0 0 ${mapW} ${mapH}`} style={box(MAP.x, MAP.y, MAP.w, MAP.h)}>
+    {districts.map((d, i) => <path id={d.id} class={`distrito${i === 0 ? '' : ''}`} d={d.d} style={`--i:${i}`} />)}
+  </svg>
+  <span class="hmf__label" style={box(MAP.x, MAP.y - 6, MAP.w, 20)}>MADRID</span>
+  <span class="hmf__chip" data-chip><span data-zona>{zones[0].name}</span></span>
+
+  <svg class="hmf__wires" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="hmf-grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffb35c" /><stop offset="1" stop-color="#cb7721" /></linearGradient>
+    </defs>
+    <path class="wire" d="M100 114 C100 132 100 132 100 150" />
+    <path class="run r1" pathLength="100" d="M100 114 C100 132 100 132 100 150" />
+    <path class="wire" data-w2 d={`M196 202 C ${(196 + zones[0].cx) / 2} 202 ${(196 + zones[0].cx) / 2} ${zones[0].cy} ${zones[0].cx} ${zones[0].cy}`} />
+    <path class="run r2" data-w2 pathLength="100" d={`M196 202 C ${(196 + zones[0].cx) / 2} 202 ${(196 + zones[0].cx) / 2} ${zones[0].cy} ${zones[0].cx} ${zones[0].cy}`} />
+    <path class="wire" data-w3 d={`M${zones[0].cx} ${zones[0].cy} C ${zones[0].cx + 50} ${zones[0].cy} 380 88 410 88`} />
+    <path class="run r3" data-w3 pathLength="100" d={`M${zones[0].cx} ${zones[0].cy} C ${zones[0].cx + 50} ${zones[0].cy} 380 88 410 88`} />
+    <path class="wire" d="M590 146 C632 190 632 230 590 262" />
+    <path class="run r4" pathLength="100" d="M590 146 C632 190 632 230 590 262" />
+    <path class="wire" d="M525 366 C525 380 545 380 545 392" />
+    <path class="run r5" pathLength="100" d="M525 366 C525 380 545 380 545 392" />
+  </svg>
+
+  {cards.map((c, i) => (
+    <div class={`hmf__card c${i + 1}`} style={c.pos}>
+      <span class="hmf__icon"><svg viewBox="0 0 24 24" set:html={c.icon} /></span>
+      <span class="hmf__copy">
+        <span class="hmf__num">{c.n}</span>
+        <span class="hmf__title">{c.title}</span>
+        <span class="hmf__text" data-tpl={c.text.includes('{zona}') ? c.text : undefined}>{c.text.replace('{zona}', zones[0].name)}</span>
+      </span>
+    </div>
+  ))}
+
+  <div class="hmf__log" style={box(0, 338, 400, 150)} data-steps={JSON.stringify(steps)}>
+    <div class="hmf__log-bar"><i></i><i></i><i></i><span>cercatv · campaña activa</span></div>
+    <ul>{steps.map(() => <li><span class="prompt">&gt;</span><span class="msg"></span></li>)}</ul>
+  </div>
+
+  <div class="hmf__people" style={box(470, 392, 150, 110)}>
+    <span class="ring r-a"></span><span class="ring r-b"></span>
+    <svg viewBox="0 0 24 24" set:html={icons.users} />
+  </div>
+</div>
+
+<style>
+  .hmf { position: absolute; top: 50%; right: max(24px, calc((100vw - var(--container-max)) / 2)); width: min(50%, 660px); aspect-ratio: 640 / 540; transform: translateY(-50%); pointer-events: none; }
+  .hmf > * { position: absolute; }
+  @media (max-width: 1100px) { .hmf { display: none; } }
+
+  /* Mapa: piezas sueltas, una se ilumina */
+  .hmf__map { overflow: visible; }
+  .hmf__map .distrito { fill: #143462; transition: fill .6s ease, filter .6s ease, transform .6s ease; transform-box: fill-box; transform-origin: center; animation: hmf-piece .7s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i) * 45ms); }
+  .hmf__map .distrito:nth-child(odd) { fill: #17396b; }
+  .hmf__map .distrito.is-active { fill: #e58a1f; filter: drop-shadow(0 0 7px rgb(255 154 46 / 85%)); transform: scale(1.06); }
+  @keyframes hmf-piece { from { opacity: 0; transform: scale(.85) translateY(10px); } to { opacity: 1; transform: none; } }
+  .hmf__label { text-align: center; color: #5aa9ff; font-size: .72rem; font-weight: 700; letter-spacing: .28em; }
+  .hmf__chip { z-index: 2; padding: 3px 12px; border: 1px solid rgb(255 194 122 / 70%); border-radius: 999px; color: #fff; background: #1c1517; font-size: .7rem; font-weight: 700; transform: translate(-50%, -190%); white-space: nowrap; box-shadow: 0 0 14px rgb(229 138 31 / 35%); transition: left .5s ease, top .5s ease; }
+
+  /* Cables con pulso */
+  .hmf__wires { inset: 0; width: 100%; height: 100%; overflow: visible; fill: none; z-index: 1; }
+  .hmf__wires .wire { stroke: rgb(229 138 31 / 30%); stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+  .hmf__wires .run { stroke: url(#hmf-grad); stroke-width: 3.5; stroke-linecap: round; stroke-dasharray: 16 84; stroke-dashoffset: 16; opacity: 0; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 5px #ff9a2e); animation: hmf-pulse 5.4s ease-in-out infinite; }
+  .hmf__wires .r2 { animation-delay: .9s; }
+  .hmf__wires .r3 { animation-delay: 1.8s; }
+  .hmf__wires .r4 { animation-delay: 2.7s; }
+  .hmf__wires .r5 { animation-delay: 3.6s; }
+  @keyframes hmf-pulse { 0% { stroke-dashoffset: 16; opacity: 1; } 14% { stroke-dashoffset: -84; opacity: 1; } 15%, 100% { stroke-dashoffset: -84; opacity: 0; } }
+
+  /* Tarjetas */
+  .hmf__card { z-index: 2; display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border: 1px solid rgb(255 255 255 / 12%); border-radius: 18px; background: linear-gradient(160deg, rgb(43 37 38 / 96%), rgb(23 20 21 / 96%)); box-shadow: 0 18px 40px rgb(0 0 0 / 40%); animation: hmf-card 5.4s ease-in-out infinite; }
+  .hmf__card.c2 { animation-delay: .9s; }
+  .hmf__card.c3 { animation-delay: 2.7s; }
+  .hmf__card.c4 { animation-delay: 3.6s; }
+  @keyframes hmf-card { 0%, 26%, 100% { border-color: rgb(255 255 255 / 12%); box-shadow: 0 18px 40px rgb(0 0 0 / 40%); } 6%, 18% { border-color: rgb(229 138 31 / 85%); box-shadow: 0 18px 40px rgb(0 0 0 / 40%), 0 0 26px rgb(229 138 31 / 40%); } }
+  .hmf__icon { flex-shrink: 0; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: linear-gradient(135deg, #f0a24f, #d9781c); box-shadow: 0 0 16px rgb(229 138 31 / 45%); }
+  .hmf__icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .hmf__copy { display: flex; flex-direction: column; min-width: 0; }
+  .hmf__num { color: #f0a24f; font-size: 1.05rem; font-weight: 800; line-height: 1; }
+  .hmf__title { margin: 3px 0 4px; color: #fff; font-size: .95rem; font-weight: 800; line-height: 1.1; }
+  .hmf__text { color: #d6cfcb; font-size: .66rem; line-height: 1.35; transition: opacity .38s ease; }
+  .hmf__text.is-out, .hmf__chip span.is-out { opacity: 0; }
+
+  /* Terminal de estado */
+  .hmf__log { z-index: 2; display: flex; flex-direction: column; padding: 10px 14px 12px; border: 1px solid rgb(255 255 255 / 12%); border-radius: 16px; background: linear-gradient(160deg, rgb(43 37 38 / 96%), rgb(15 13 14 / 96%)); box-shadow: 0 18px 40px rgb(0 0 0 / 40%); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .hmf__log-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+  .hmf__log-bar i { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / 18%); }
+  .hmf__log-bar i:first-child { background: #cb7721; }
+  .hmf__log-bar span { margin-left: auto; color: #8f8783; font-size: .58rem; letter-spacing: .06em; text-transform: uppercase; }
+  .hmf__log ul { display: flex; flex-direction: column; gap: 7px; margin: 0; padding: 0; list-style: none; }
+  .hmf__log li { display: flex; gap: 8px; min-height: 1.1em; color: #6f6763; font-size: .7rem; line-height: 1.3; opacity: 0; transition: opacity .25s ease, color .25s ease; }
+  .hmf__log li.is-on { opacity: 1; color: #f2ece8; }
+  .hmf__log li.is-done { color: #b9b1ad; }
+  .hmf__log li.is-done .msg::after { content: ' ✓'; color: #7ed18b; }
+  .hmf__log li.is-on:not(.is-done) .msg::after { content: '▍'; margin-left: 2px; color: #f0a24f; animation: hmf-blink 1s steps(1) infinite; }
+  .hmf__log .prompt { color: #cb7721; font-weight: 700; }
+  @keyframes hmf-blink { 50% { opacity: 0; } }
+
+  /* Audiencia */
+  .hmf__people { z-index: 2; display: grid; place-items: center; color: #f0a24f; }
+  .hmf__people svg { position: relative; width: 46%; fill: rgb(240 162 79 / 25%); stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 10px rgb(229 138 31 / 70%)); }
+  .hmf__people .ring { position: absolute; left: 50%; top: 68%; border: 2px solid rgb(240 162 79 / 60%); border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 14px rgb(229 138 31 / 45%); animation: hmf-ring 5.4s ease-in-out infinite; animation-delay: 4.5s; }
+  .hmf__people .r-a { width: 88%; height: 30%; }
+  .hmf__people .r-b { width: 62%; height: 21%; }
+  @keyframes hmf-ring { 0%, 30%, 100% { opacity: .45; } 8%, 20% { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hmf__wires .run, .hmf__card, .hmf__people .ring, .hmf__map .distrito { animation: none; }
+    .hmf__wires .run { opacity: 0; }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-hmf]');
+  if (root) {
+    type Zone = { slug: string; name: string; cx: number; cy: number };
+    const zones: Zone[] = JSON.parse(root.dataset.zones ?? '[]');
+    const districts = [...root.querySelectorAll<SVGPathElement>('.distrito')];
+    const texts = [...root.querySelectorAll<HTMLElement>('[data-tpl]')];
+    const zonaEls = [...root.querySelectorAll<HTMLElement>('[data-zona]')];
+    const w2 = [...root.querySelectorAll<SVGPathElement>('[data-w2]')];
+    const w3 = [...root.querySelectorAll<SVGPathElement>('[data-w3]')];
+    const chip = root.querySelector<HTMLElement>('[data-chip]')!;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const apply = (z: Zone) => {
+      districts.forEach((p) => p.classList.toggle('is-active', p.id === z.slug));
+      const mid = (196 + z.cx) / 2;
+      w2.forEach((p) => p.setAttribute('d', `M196 202 C ${mid} 202 ${mid} ${z.cy} ${z.cx} ${z.cy}`));
+      w3.forEach((p) => p.setAttribute('d', `M${z.cx} ${z.cy} C ${z.cx + 50} ${z.cy} 380 88 410 88`));
+      chip.style.left = `${(z.cx / 640) * 100}%`;
+      chip.style.top = `${(z.cy / 540) * 100}%`;
+      texts.forEach((el) => { el.textContent = (el.dataset.tpl ?? '').replace('{zona}', z.name); });
+      zonaEls.forEach((el) => { el.textContent = z.name; });
+    };
+
+    // Terminal: escribe cada mensaje cuando el pulso llega a su paso (ciclo de 5,4 s)
+    const logBox = root.querySelector<HTMLElement>('[data-steps]')!;
+    const steps: { at: number; text: string }[] = JSON.parse(logBox.dataset.steps ?? '[]');
+    const lis = [...logBox.querySelectorAll<HTMLElement>('li')];
+    let index = 0;
+    let cycle = 0;
+    let timers: number[] = [];
+
+    const fullText = (i: number) => steps[i].text.replace('{zona}', zones[index].name);
+    const msgOf = (i: number) => lis[i].querySelector<HTMLElement>('.msg')!;
+
+    // El progreso se calcula por tiempo transcurrido (no por nº de ticks) para que no se quede a medias si el navegador ralentiza los temporizadores.
+    const typeLine = (i: number) => {
+      if (i > 0) { msgOf(i - 1).textContent = fullText(i - 1); lis[i - 1].classList.add('is-done'); }
+      lis[i].classList.add('is-on');
+      const full = fullText(i);
+      if (reduced) { msgOf(i).textContent = full; return; }
+      const start = performance.now();
+      const t = window.setInterval(() => {
+        const n = Math.min(full.length, Math.floor((performance.now() - start) / 26) + 1);
+        msgOf(i).textContent = full.slice(0, n);
+        if (n >= full.length) clearInterval(t);
+      }, 26);
+      timers.push(t);
+    };
+
+    const runCycle = () => {
+      timers.forEach((t) => { clearTimeout(t); clearInterval(t); });
+      timers = [];
+      lis.forEach((li) => { li.classList.remove('is-on', 'is-done'); li.querySelector('.msg')!.textContent = ''; });
+      steps.forEach((s, i) => timers.push(window.setTimeout(() => typeLine(i), s.at)));
+      timers.push(window.setTimeout(() => { const last = lis.length - 1; msgOf(last).textContent = fullText(last); lis[last].classList.add('is-done'); }, 4700));
+    };
+
+    apply(zones[0]);
+    runCycle();
+    if (reduced) {
+      steps.forEach((_, i) => typeLine(i));
+      lis.forEach((li) => li.classList.add('is-done'));
+    } else {
+      setInterval(() => {
+        cycle += 1;
+        if (cycle % 2 === 0 && zones.length > 1) {
+          const fading = [...texts, ...zonaEls];
+          fading.forEach((el) => el.classList.add('is-out'));
+          setTimeout(() => {
+            index = (index + 1) % zones.length;
+            apply(zones[index]);
+            fading.forEach((el) => el.classList.remove('is-out'));
+          }, 380);
+        }
+        runCycle();
+      }, 5400);
+    }
+  }
+</script>
