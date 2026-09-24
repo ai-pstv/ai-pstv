@@ -179,7 +179,7 @@
 }
 
 /* Ficha individual de caso de éxito (/casos-de-exito/[slug]) */
-.case-story { max-width: var(--content-width); padding: clamp(84px, 11vw, 150px) 24px; margin: 0 auto; }
+.case-story { max-width: var(--content-width); padding: clamp(36px, 4vw, 56px) 24px; margin: 0 auto; }
 .case-story__back { display: inline-block; margin-bottom: 32px; color: var(--color-text-muted); font-size: .85rem; font-weight: var(--font-weight-bold); text-decoration: none; }
 .case-story__back:hover { color: var(--color-text); }
 .case-story__layout { display: grid; grid-template-columns: minmax(0, 780px) 1fr; gap: 64px; align-items: start; }
@@ -209,7 +209,7 @@
   .case-story__sidebar { padding-top: 0; }
 }
 @media (max-width: 620px) {
-  .case-story { padding: 64px 18px; }
+  .case-story { padding: 32px 18px; }
   .case-story__cta { width: 100%; justify-content: center; }
 }
 
