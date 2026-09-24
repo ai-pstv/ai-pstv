@@ -6,6 +6,11 @@ import '../styles/footer.css';
 import Header from '../components/Header.astro';
 import AuthGate from '../components/AuthGate.astro';
 import FlowPanel from '../components/FlowPanel.astro';
+import FaqChatPanel from '../components/FaqChatPanel.astro';
+import FaqSearchPanel from '../components/FaqSearchPanel.astro';
+
+// REVERSIBLE: panel animado del hero. 'search' (buscador), 'chat' (pregunta y respuesta) o 'flow' (proceso con iconos).
+const HERO_PANEL: 'search' | 'chat' | 'flow' = 'search';
 import Footer from '../components/Footer.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -118,7 +123,9 @@ const breadcrumbSchema = {
     <Header />
     <main>
       <section class="faqs-hero">
-        <FlowPanel />
+        {HERO_PANEL === 'search' && <FaqSearchPanel />}
+        {HERO_PANEL === 'chat' && <FaqChatPanel />}
+        {HERO_PANEL === 'flow' && <FlowPanel />}
         <nav class="faqs-breadcrumb" aria-label="Ruta de navegación"><a href={`${base}/`}>Inicio</a><span>/</span><span>Preguntas frecuentes</span></nav>
         <h1>Preguntas frecuentes</h1>
         <p>Aquí encontrarás respuestas a las dudas más habituales sobre publicidad segmentada en televisión.</p>

@@ -1,0 +1,60 @@
+---
+// Panel animado del hero de FAQ: una pregunta se teclea sola y recibe su respuesta corta; luego pasa a la siguiente.
+// Reutiliza el marco visual de FlowPanel (.flow-panel). Para volver al panel anterior, usar <FlowPanel /> en la página.
+const chats = [
+  { q: '¿Cuál es la inversión mínima para empezar?', a: 'Depende de la zona y de la duración de la campaña. Estudiamos tu caso antes de darte una cifra.' },
+  { q: '¿Necesito producir un anuncio de televisión?', a: 'No es obligatorio. Puedes usar creatividades que ya tengas o formatos sencillos pensados para negocios locales.' },
+  { q: '¿Puedo segmentar por código postal?', a: 'Sí: por código postal, barrio o ciudad, según las opciones disponibles en cada zona.' },
+  { q: '¿Cómo se mide el resultado de una campaña?', a: 'Fijamos contigo un objetivo de negocio (visitas, llamadas, reservas…) y lo medimos durante y después.' },
+];
+---
+<div class="flow-panel faq-chat" aria-hidden="true" data-faq-chat data-chats={JSON.stringify(chats)}>
+  <div class="flow-panel__bar"><i></i><i></i><i></i><span>Preguntas frecuentes</span></div>
+  <div class="faq-chat__body">
+    <div class="faq-chat__msg faq-chat__msg--q"><span class="faq-chat__who">Tú</span><p data-chat-q>{chats[0].q}</p></div>
+    <div class="faq-chat__msg faq-chat__msg--a"><span class="faq-chat__who">+CercaTV</span><p data-chat-a>{chats[0].a}</p></div>
+  </div>
+</div>
+
+<script>
+  const panel = document.querySelector<HTMLElement>('[data-faq-chat]');
+  if (panel && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const chats: { q: string; a: string }[] = JSON.parse(panel.dataset.chats ?? '[]');
+    const q = panel.querySelector<HTMLElement>('[data-chat-q]')!;
+    const a = panel.querySelector<HTMLElement>('[data-chat-a]')!;
+    const msgQ = q.parentElement!;
+    const msgA = a.parentElement!;
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    // Escribe el texto según el tiempo transcurrido, para que no se descuadre si el navegador frena los temporizadores.
+    const type = (el: HTMLElement, text: string, msPerChar: number) => new Promise<void>((resolve) => {
+      const start = performance.now();
+      const tick = (now: number) => {
+        const n = Math.min(text.length, Math.floor((now - start) / msPerChar));
+        el.textContent = text.slice(0, n);
+        if (n < text.length) requestAnimationFrame(tick); else resolve();
+      };
+      requestAnimationFrame(tick);
+    });
+    const run = async () => {
+      let i = 0;
+      panel.classList.add('is-running');
+      for (;;) {
+        const { q: question, a: answer } = chats[i % chats.length];
+        q.textContent = ''; a.textContent = '';
+        msgA.classList.remove('is-on');
+        msgQ.classList.add('is-on', 'is-typing');
+        await type(q, question, 34);
+        msgQ.classList.remove('is-typing');
+        await wait(450);
+        msgA.classList.add('is-on', 'is-typing');
+        await type(a, answer, 20);
+        msgA.classList.remove('is-typing');
+        await wait(3200);
+        msgQ.classList.remove('is-on'); msgA.classList.remove('is-on');
+        await wait(450);
+        i += 1;
+      }
+    };
+    run();
+  }
+</script>

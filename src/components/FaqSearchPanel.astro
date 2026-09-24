@@ -1,0 +1,94 @@
+---
+// Panel animado del hero de FAQ: una búsqueda se teclea sola, aparecen las preguntas relacionadas y la primera se despliega con su respuesta.
+// Reutiliza el marco y los colores claro/oscuro de FaqChatPanel (.flow-panel .faq-chat). Ver el interruptor HERO_PANEL en preguntas-frecuentes.astro.
+const searches = [
+  { term: 'precio', results: [
+    { q: '¿Cuál es la inversión mínima para empezar?', a: 'Depende de la zona y de la duración de la campaña. Estudiamos tu caso antes de darte una cifra.' },
+    { q: '¿Cómo se contrata una campaña?' },
+    { q: '¿En qué se diferencia de la publicidad en TV tradicional?' },
+  ] },
+  { term: 'anuncio', results: [
+    { q: '¿Necesito producir un anuncio de televisión?', a: 'No es obligatorio. Puedes usar creatividades que ya tengas o formatos sencillos para negocios locales.' },
+    { q: '¿Qué formatos de creatividad admite +CercaTV?' },
+    { q: '¿En qué canales se emiten los anuncios?' },
+  ] },
+  { term: 'código postal', results: [
+    { q: '¿Puedo segmentar por código postal?', a: 'Sí: por código postal, barrio o ciudad, según las opciones disponibles en cada zona.' },
+    { q: '¿Puedo anunciarme solo en determinadas zonas?' },
+    { q: '¿Cómo funciona la publicidad segmentada en televisión?' },
+  ] },
+  { term: 'resultados', results: [
+    { q: '¿Cómo se mide el resultado de una campaña?', a: 'Fijamos contigo un objetivo de negocio (visitas, llamadas, reservas…) y lo medimos durante y después.' },
+    { q: '¿Qué informes recibo durante la campaña?' },
+    { q: '¿Tenéis casos de éxito reales?' },
+  ] },
+];
+const first = searches[0];
+---
+<div class="flow-panel faq-chat faq-search" aria-hidden="true" data-faq-search data-searches={JSON.stringify(searches)}>
+  <div class="flow-panel__bar"><i></i><i></i><i></i><span>Buscador</span></div>
+  <div class="faq-search__field">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <span data-search-term>{first.term}</span>
+  </div>
+  <ul class="faq-search__results" data-search-results>
+    {first.results.map((r, i) => (
+      <li class:list={['is-on', i === 0 && 'is-open']}><span class="q">{r.q}</span>{r.a && <span class="a">{r.a}</span>}</li>
+    ))}
+  </ul>
+</div>
+
+<script>
+  const panel = document.querySelector<HTMLElement>('[data-faq-search]');
+  if (panel && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const searches: { term: string; results: { q: string; a?: string }[] }[] = JSON.parse(panel.dataset.searches ?? '[]');
+    const term = panel.querySelector<HTMLElement>('[data-search-term]')!;
+    const field = term.parentElement!;
+    const list = panel.querySelector<HTMLElement>('[data-search-results]')!;
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    // Escribe según el tiempo transcurrido, para que no se descuadre si el navegador frena los temporizadores.
+    const type = (text: string, msPerChar: number) => new Promise<void>((resolve) => {
+      const start = performance.now();
+      const tick = (now: number) => {
+        const n = Math.min(text.length, Math.floor((now - start) / msPerChar));
+        term.textContent = text.slice(0, n);
+        if (n < text.length) requestAnimationFrame(tick); else resolve();
+      };
+      requestAnimationFrame(tick);
+    });
+    const build = (results: { q: string; a?: string }[]) => {
+      list.textContent = '';
+      return results.map((r) => {
+        const li = document.createElement('li');
+        const q = document.createElement('span');
+        q.className = 'q'; q.textContent = r.q;
+        li.append(q);
+        if (r.a) { const a = document.createElement('span'); a.className = 'a'; a.textContent = r.a; li.append(a); }
+        list.append(li);
+        return li;
+      });
+    };
+    const run = async () => {
+      panel.classList.add('is-running');
+      list.textContent = '';
+      let i = 0;
+      for (;;) {
+        const { term: text, results } = searches[i % searches.length];
+        term.textContent = '';
+        field.classList.add('is-typing');
+        await type(text, 90);
+        await wait(300);
+        field.classList.remove('is-typing');
+        const items = build(results);
+        for (const li of items) { await wait(160); li.classList.add('is-on'); }
+        await wait(450);
+        items[0].classList.add('is-open');
+        await wait(3600);
+        items.forEach((li) => li.classList.remove('is-on'));
+        await wait(450);
+        i += 1;
+      }
+    };
+    run();
+  }
+</script>
