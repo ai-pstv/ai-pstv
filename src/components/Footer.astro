@@ -6,10 +6,13 @@ interface Props {
 const { locale = 'es' } = Astro.props;
 
 const translations = {
-  es: { about: 'Quiénes somos', media: '+Cerca Media', exclusivity: 'Exclusividad con Atresmedia', solutions: 'Soluciones', cases: 'Casos de éxito', faq: 'FAQs', contact: 'Contacto', legal: 'Aviso Legal', privacy: 'Política de Privacidad', cookies: 'Política de Cookies' },
-  en: { about: 'About us', media: '+Cerca Media', exclusivity: 'Exclusivity with Atresmedia', solutions: 'Solutions', cases: 'Success stories', faq: 'FAQs', contact: 'Contact', legal: 'Legal Notice', privacy: 'Privacy Policy', cookies: 'Cookie Policy' },
-  ca: { about: 'Qui som', media: '+Cerca Media', exclusivity: 'Exclusivitat amb Atresmedia', solutions: 'Solucions', cases: 'Casos d’èxit', faq: 'FAQs', contact: 'Contacte', legal: 'Avís Legal', privacy: 'Política de Privacitat', cookies: 'Política de Galetes' },
+  es: { about: 'Quiénes somos', media: '+Cerca Media', exclusivity: 'Exclusividad con Atresmedia', solutions: 'Soluciones', cases: 'Casos de éxito', faq: 'FAQs', contact: 'Contacto', legal: 'Aviso Legal', privacy: 'Política de Privacidad', cookies: 'Política de Cookies', mapsLead: 'Mapas: datos abiertos de los Ayuntamientos de', mapsAnd: 'y' },
+  en: { about: 'About us', media: '+Cerca Media', exclusivity: 'Exclusivity with Atresmedia', solutions: 'Solutions', cases: 'Success stories', faq: 'FAQs', contact: 'Contact', legal: 'Legal Notice', privacy: 'Privacy Policy', cookies: 'Cookie Policy', mapsLead: 'Maps: open data from the city councils of', mapsAnd: 'and' },
+  ca: { about: 'Qui som', media: '+Cerca Media', exclusivity: 'Exclusivitat amb Atresmedia', solutions: 'Solucions', cases: 'Casos d’èxit', faq: 'FAQs', contact: 'Contacte', legal: 'Avís Legal', privacy: 'Política de Privacitat', cookies: 'Política de Galetes', mapsLead: 'Mapes: dades obertes dels Ajuntaments de', mapsAnd: 'i' },
 };
+
+// Línea de créditos de los mapas del hero (datos abiertos). Oculta por ahora; poner a true para mostrarla.
+const SHOW_MAP_CREDITS = false;
 
 const translation = translations[locale];
 
@@ -66,5 +69,8 @@ const socials = [
     <a href={path('/aviso-legal')}>{translation.legal}</a>
     <a href={path('/politica-privacidad')}>{translation.privacy}</a>
     <a href={path('/politica-cookies')}>{translation.cookies}</a>
+    {SHOW_MAP_CREDITS && (
+      <p class="site-footer__credits">{translation.mapsLead}{' '}<a href="https://datos.madrid.es/" target="_blank" rel="noopener">Madrid</a>{', '}<a href="https://opendata-ajuntament.barcelona.cat/" target="_blank" rel="noopener">Barcelona</a>{' '}{translation.mapsAnd}{' '}<a href="https://datosabiertos.malaga.eu/" target="_blank" rel="noopener">{locale === 'ca' ? 'Màlaga' : 'Málaga'}</a>{' (CC BY 4.0).'}</p>
+    )}
   </div>
 </footer>

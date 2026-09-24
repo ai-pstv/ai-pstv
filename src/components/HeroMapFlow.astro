@@ -62,13 +62,19 @@ const icons = {
   tv: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 3l4 3 4-3"/>',
   users: '<circle cx="9" cy="8" r="3.2"/><path d="M2.8 19a6.2 6.2 0 0 1 12.4 0"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.5 13.2a5 5 0 0 1 5.7 5.8"/>',
 };
+// Audiencia: enjambre de puntos (cada punto = una persona), en espiral de Vogel dentro de una elipse.
+const dots = Array.from({ length: 34 }, (_, i) => {
+  const r = Math.sqrt((i + 0.5) / 34);
+  const a = i * 2.399963;
+  return { x: +(50 + 46 * r * Math.cos(a)).toFixed(1), y: +(50 + 42 * r * Math.sin(a)).toFixed(1), s: i % 7 === 0 ? 9 : i % 3 === 0 ? 7 : 5 };
+});
 const cardIcons = [icons.play, icons.pin, icons.tv, icons.users];
 const cardPos = [box(0, 10, 230, 104), box(0, 150, 196, 104), box(410, 30, 230, 116), box(410, 262, 230, 104)];
 const cards = copy.cards.map((c, i) => ({ n: `0${i + 1}`, icon: cardIcons[i], title: c.title, text: c.text, pos: cardPos[i] }));
 ---
 <div class="hmf" aria-hidden="true" data-hmf data-zones={JSON.stringify(zones)}>
   <svg class="hmf__map" viewBox={`0 0 ${mapW} ${mapH}`} style={box(MAP.x, MAP.y, MAP.w, MAP.h)}>
-    {districts.map((d, i) => <path id={d.id} class={`distrito${i === 0 ? '' : ''}`} d={d.d} style={`--i:${i}`} />)}
+    {districts.map((d, i) => <path id={d.id} class="distrito" d={d.d} style={`--i:${i}`} />)}
   </svg>
   <span class="hmf__label" style={box(MAP.x, MAP.y - 6, MAP.w, 20)}>{city}</span>
   <span class="hmf__chip" data-chip><span data-zona>{zones[0].name}</span></span>
@@ -106,8 +112,7 @@ const cards = copy.cards.map((c, i) => ({ n: `0${i + 1}`, icon: cardIcons[i], ti
   </div>
 
   <div class="hmf__people" style={box(470, 392, 150, 110)}>
-    <span class="ring r-a"></span><span class="ring r-b"></span>
-    <svg viewBox="0 0 24 24" set:html={icons.users} />
+    {dots.map((d, i) => <span class="dot" style={`left:${d.x}%;top:${d.y}%;--i:${i};--s:${d.s}px`}></span>)}
   </div>
 </div>
 
@@ -155,7 +160,7 @@ const cards = copy.cards.map((c, i) => ({ n: `0${i + 1}`, icon: cardIcons[i], ti
   .hmf__icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .hmf__copy { display: flex; flex-direction: column; min-width: 0; }
   .hmf__num { color: #f0a24f; font-size: 1.05rem; font-weight: 800; line-height: 1; }
-  .hmf__title { margin: 3px 0 4px; color: #fff; font-size: .95rem; font-weight: 800; line-height: 1.1; }
+  .hmf__title { margin: 3px 0 4px; color: #fff; font-size: .8rem; font-weight: 800; line-height: 1.1; }
   .hmf__text { color: #d6cfcb; font-size: .66rem; line-height: 1.35; transition: opacity .38s ease; }
   .hmf__text.is-out, .hmf__chip span.is-out { opacity: 0; }
 
@@ -174,16 +179,19 @@ const cards = copy.cards.map((c, i) => ({ n: `0${i + 1}`, icon: cardIcons[i], ti
   .hmf__log .prompt { color: #cb7721; font-weight: 700; }
   @keyframes hmf-blink { 50% { opacity: 0; } }
 
-  /* Audiencia */
-  .hmf__people { z-index: 2; display: grid; place-items: center; color: #f0a24f; }
-  .hmf__people svg { position: relative; width: 46%; fill: rgb(240 162 79 / 25%); stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 10px rgb(229 138 31 / 70%)); }
-  .hmf__people .ring { position: absolute; left: 50%; top: 68%; border: 2px solid rgb(240 162 79 / 60%); border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 14px rgb(229 138 31 / 45%); animation: hmf-ring 5.4s ease-in-out infinite; animation-delay: 4.5s; }
-  .hmf__people .r-a { width: 88%; height: 30%; }
-  .hmf__people .r-b { width: 62%; height: 21%; }
-  @keyframes hmf-ring { 0%, 30%, 100% { opacity: .45; } 8%, 20% { opacity: 1; } }
+  /* Audiencia: puntos que se iluminan en oleada cuando llega el pulso */
+  .hmf__people { z-index: 2; }
+  .hmf__people .dot { position: absolute; width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2); border-radius: 50%; background: #28507f; animation: hmf-dot 5.4s ease-in-out infinite; animation-delay: calc(var(--i) * 30ms); }
+  @keyframes hmf-dot {
+    0%, 78% { background: #28507f; box-shadow: none; transform: scale(1); }
+    84% { background: #ffb35c; box-shadow: 0 0 12px #ff9a2e; transform: scale(1.5); }
+    92%, 97% { background: #f0a24f; box-shadow: 0 0 8px rgb(255 154 46 / 70%); transform: scale(1.15); }
+    100% { background: #28507f; box-shadow: none; transform: scale(1); }
+  }
 
   @media (prefers-reduced-motion: reduce) {
-    .hmf__wires .run, .hmf__card, .hmf__people .ring, .hmf__map .distrito { animation: none; }
+    .hmf__wires .run, .hmf__card, .hmf__map .distrito { animation: none; }
+    .hmf__people .dot { animation: none; background: #f0a24f; }
     .hmf__wires .run { opacity: 0; }
   }
 </style>
@@ -254,7 +262,7 @@ const cards = copy.cards.map((c, i) => ({ n: `0${i + 1}`, icon: cardIcons[i], ti
     } else {
       setInterval(() => {
         cycle += 1;
-        if (cycle % 2 === 0 && zones.length > 1) {
+        if (zones.length > 1) {
           const fading = [...texts, ...zonaEls];
           fading.forEach((el) => el.classList.add('is-out'));
           setTimeout(() => {
