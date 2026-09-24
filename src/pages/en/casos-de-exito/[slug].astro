@@ -1,0 +1,14 @@
+---
+import { getCollection } from 'astro:content';
+import CaseDetail from '../../../components/CaseDetail.astro';
+
+// Solo se generan los casos que tienen traducción a este idioma.
+export async function getStaticPaths() {
+  const casos = await getCollection('casos');
+  return casos.filter((caso) => caso.data.traducciones?.en).map((caso) => ({ params: { slug: caso.id }, props: { caso } }));
+}
+
+const { caso } = Astro.props;
+---
+
+<CaseDetail caso={caso} locale="en" />

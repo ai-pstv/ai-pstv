@@ -41,10 +41,12 @@ const pathWithoutLocale = (() => {
   return currentPathNoBase;
 })();
 
-// Solo la home existe traducida en los 3 idiomas por ahora. El resto de páginas (casos de éxito, etc.)
+// Solo la home y el caso de Motor Dye existen traducidos en los 3 idiomas por ahora. El resto de páginas
+// (casos de éxito, etc.)
 // solo existen en español, así que el selector de idioma debe quedarse en la versión en español
 // de esa misma página en vez de romper en un 404.
-const hasTranslations = pathWithoutLocale === '/';
+const translatedPaths = ['/', '/casos-de-exito/motor-dye'];
+const hasTranslations = translatedPaths.includes(pathWithoutLocale);
 
 const hrefForLocale = (code: 'es' | 'en' | 'ca') => {
   if (code === 'es' || !hasTranslations) return path(pathWithoutLocale);

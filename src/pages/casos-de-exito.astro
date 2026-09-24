@@ -32,9 +32,10 @@ const cases = casosCollection
       statDesc: d.resultadoDescripcion,
       progress: d.progreso,
       slug: entry.id,
+      featured: d.destacado,
     };
   })
-  .sort((a, b) => a.index.localeCompare(b.index));
+  .sort((a, b) => Number(b.featured) - Number(a.featured) || a.index.localeCompare(b.index)); // destacados primero
 
 const filters = [
   { label: 'Todos', value: 'todos' },

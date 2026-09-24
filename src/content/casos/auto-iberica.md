@@ -13,5 +13,5 @@ resultadoSufijo: ""
 resultadoDescripcion: "más leads cualificados que en la campaña anterior."
 progreso: 80
 descripcion: "Campaña emitida en los canales de Atresmedia, segmentada por la zona de cobertura real del concesionario, sin necesidad de producir un spot desde cero."
-destacado: true
+destacado: false
 ---

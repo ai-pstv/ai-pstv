@@ -17,6 +17,7 @@ Opciones:
     --salida DIR    carpeta de salida (por defecto public/images/hero)
 
 Fuentes y licencias (mencionar la fuente en la web, ver el pie de página):
+    fuenlabrada  OpenStreetMap (ODbL), límite municipal, para el mapa de un caso
     madrid     Ayuntamiento de Madrid, Geoportal - Distritos (TopoJSON)
     barcelona  Ajuntament de Barcelona, Open Data BCN - Districtes (vía martgnz/bcn-geodata)
     malaga     Ayuntamiento de Málaga, Datos abiertos - Distrito Municipal (CC BY 4.0)
@@ -73,6 +74,17 @@ CIUDADES = {
             'PUERTO DE LA TORRE': 'Puerto de la Torre', 'CAMPANILLAS': 'Campanillas',
         },
     },
+    # Municipio completo (mapa de un caso de éxito): un único polígono, límite de OpenStreetMap (ODbL)
+    'fuenlabrada': {
+        'url': 'https://nominatim.openstreetmap.org/search?q=Fuenlabrada,Madrid&format=geojson&polygon_geojson=1&polygon_threshold=0.0002&limit=1&featuretype=city',
+        'formato': 'geojson',
+        'nombre_fijo': 'Fuenlabrada',
+        'tamano': 300.0,
+        'rendija': 0.0,
+        'aria': 'Mapa de Fuenlabrada',
+        'carpeta': os.path.join('public', 'images', 'casos'),
+        'nombres': {},
+    },
 }
 
 
@@ -82,7 +94,9 @@ def descargar(ciudad, cfg):
     destino = os.path.join(cache, f'{ciudad}.json')
     if not os.path.exists(destino):
         print(f'  descargando {cfg["url"]}')
-        urllib.request.urlretrieve(cfg['url'], destino)
+        peticion = urllib.request.Request(cfg['url'], headers={'User-Agent': 'cercatv-mapas/1.0'})
+        with urllib.request.urlopen(peticion) as r, open(destino, 'wb') as f:
+            f.write(r.read())
     with open(destino, encoding='utf-8') as f:
         return json.load(f)
 
@@ -132,6 +146,9 @@ def distritos_geojson(data, cfg):
         poligonos = [geom['coordinates']] if geom['type'] == 'Polygon' else geom['coordinates']
         partes = [([(c[0], c[1]) for c in p[0]], [[(c[0], c[1]) for c in r] for r in p[1:]]) for p in poligonos]
         props = f['properties']
+        if 'nombre_fijo' in cfg:
+            salida.append((cfg['nombre_fijo'], 1, partes))
+            continue
         salida.append((str(props[cfg['campo_nombre']]).strip(), int(props[cfg['campo_orden']]), partes))
     return salida
 
@@ -194,7 +211,7 @@ def generar(ciudad, rendija=None, simplificar=0.25, salida=None):
         lineas.append(f'    <path id="{slug(nombre)}" class="distrito" data-nombre="{nombre}" d="{d_de(q)}"/>')
     lineas += ['  </g>', '</svg>']
 
-    carpeta = salida or os.path.join(RAIZ, 'public', 'images', 'hero')
+    carpeta = salida or os.path.join(RAIZ, cfg.get('carpeta', os.path.join('public', 'images', 'hero')))
     os.makedirs(carpeta, exist_ok=True)
     ruta = os.path.join(carpeta, f'mapa-{ciudad}.svg')
     with open(ruta, 'w', encoding='utf-8') as f:
