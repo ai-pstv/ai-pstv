@@ -16,6 +16,7 @@ progreso: 65
 descripcion: "Campaña del SEAT León Híbrido en la zona de cobertura real del concesionario en Fuenlabrada."
 imagen: "leon.jpg"
 mapa: fuenlabrada
+codigosPostales: ["28941", "28942", "28943", "28945"]  # PRUEBA: códigos de ejemplo, confirmar los reales; borrar esta línea para volver al municipio entero
 lat: 40.2704
 lng: -3.7610
 destacado: true

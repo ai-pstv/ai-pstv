@@ -10,6 +10,21 @@ Los heros de la home (ES, CA y EN) incluyen un panel animado con un **mapa de di
 | Catalán | `src/pages/ca/index.astro` | Barcelona | 10 | `public/images/hero/mapa-barcelona.svg` |
 | Inglés | `src/pages/en/index.astro` | Málaga | 11 | `public/images/hero/mapa-malaga.svg` |
 
+## Cómo llegan los mapas a este proyecto
+
+Los mapas se generan en un **proyecto aparte** (`/Volumes/Macintosh HD2/Desarrollo AI/mapas`), que tiene el script y un registro de fuentes. Aquí solo se guardan los SVG ya terminados: cuando hace falta una ciudad nueva (por ejemplo Sevilla), se genera allí con todos sus distritos, de modo que si más adelante hace falta otro distrito ya está incluido, y se copia el SVG a `public/images/hero/` (mapa de distritos del hero) o `public/images/casos/` (municipio de un caso). El script de este proyecto (`scripts/generar-mapas.py`) sigue funcionando, pero la copia de referencia es la del proyecto de mapas.
+
+## Registro de mapas: fuente y licencia de cada SVG
+
+| Mapa | Fuente | Licencia | Atribución obligatoria |
+|---|---|---|---|
+| `mapa-madrid.svg` | Ayuntamiento de Madrid (Geoportal) | Datos abiertos del Ayuntamiento | Recomendable |
+| `mapa-barcelona.svg` | Open Data BCN, vía copia de terceros `martgnz/bcn-geodata` | Datos abiertos del Ajuntament | Recomendable |
+| `mapa-malaga.svg` | Ayuntamiento de Málaga, datos abiertos | CC BY 4.0 | **Sí** |
+| `mapa-fuenlabrada.svg` | OpenStreetMap (Nominatim) | ODbL | **Sí** |
+
+Una vez generado, el SVG funciona sin el script ni las fuentes. La fuente se conserva solo para citarla al activar la atribución del pie (`SHOW_MAP_CREDITS`); habrá que añadir OpenStreetMap a esa línea.
+
 ## Fuentes de datos y licencias
 
 Los datos son **abiertos y oficiales** de cada ayuntamiento. Se descargan automáticamente al ejecutar el script.
@@ -19,6 +34,7 @@ Los datos son **abiertos y oficiales** de cada ayuntamiento. Se descargan autom�
 | Madrid | [Geoportal del Ayuntamiento de Madrid](https://geoportal.madrid.es/fsdescargas/IDEAM_WBGEOPORTAL/LIMITES_ADMINISTRATIVOS/Distritos/TopoJSON/Distritos.json), parte del portal [datos.madrid.es](https://datos.madrid.es/dataset/300497-0-distritos-municipales-madrid) | TopoJSON | Datos abiertos del Ayuntamiento. Incluye el ajuste de límites de 2020 |
 | Barcelona | [Open Data BCN](https://opendata-ajuntament.barcelona.cat/) (Ajuntament de Barcelona), a través de la copia en GeoJSON de [martgnz/bcn-geodata](https://github.com/martgnz/bcn-geodata) | GeoJSON | Datos abiertos del Ajuntament. **Se descargan de una copia de terceros**, no directamente del portal |
 | Málaga | [Datos abiertos del Ayuntamiento de Málaga](https://datosabiertos.malaga.eu/dataset/sistema-de-informacion-cartografica-distrito-municipal), "Sistema de Información Cartográfica - Distrito Municipal" | GeoJSON (EPSG:4326) | **CC BY 4.0**: exige atribución |
+| Fuenlabrada (municipio) | Límite municipal de [OpenStreetMap](https://www.openstreetmap.org/), obtenido con Nominatim | GeoJSON | **ODbL**: exige atribución (© colaboradores de OpenStreetMap). No es una fuente cartográfica oficial |
 
 ### Atribución
 
@@ -110,8 +126,8 @@ scripts/generar-mapas.py             generador de los SVG
 public/images/hero/mapa-madrid.svg
 public/images/hero/mapa-barcelona.svg
 public/images/hero/mapa-malaga.svg
-public/images/hero/distritos.svg     original de Illustrator (sin uso; se puede borrar)
 public/images/hero/hero.png          imagen de prueba (sin uso; se puede borrar)
+public/images/casos/mapa-fuenlabrada.svg  municipio del caso Motor Dye
 src/components/HeroMapFlow.astro     panel animado que usa los mapas
 src/components/Footer.astro          línea de atribución de los mapas
 ```

@@ -6,3 +6,6 @@ tmp/
 .pnpm-store/
 .cache-mapas/
 .venv-mapas/
+
+# Datos de origen de los mapas (muy pesados; solo en local)
+Mapas ciudades/

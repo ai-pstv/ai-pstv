@@ -31,6 +31,8 @@ const casos = defineCollection({
     descripcion: z.string(),
     imagen: z.string().optional(),
     mapa: z.string().optional(),
+    // Opcional: códigos postales afectados por la campaña (requiere public/images/casos/mapa-<mapa>-cp.svg). Quitar el campo para volver al municipio entero.
+    codigosPostales: z.array(z.string()).optional(),
     lat: z.number().optional(),
     lng: z.number().optional(),
     destacado: z.boolean().default(false),

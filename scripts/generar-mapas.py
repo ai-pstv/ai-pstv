@@ -17,6 +17,7 @@ Opciones:
     --salida DIR    carpeta de salida (por defecto public/images/hero)
 
 Fuentes y licencias (mencionar la fuente en la web, ver el pie de página):
+    fuenlabrada-cp  Códigos postales de Fuenlabrada, de la carpeta local 'Mapas ciudades' (origen y licencia por confirmar)
     fuenlabrada  OpenStreetMap (ODbL), límite municipal, para el mapa de un caso
     madrid     Ayuntamiento de Madrid, Geoportal - Distritos (TopoJSON)
     barcelona  Ajuntament de Barcelona, Open Data BCN - Districtes (vía martgnz/bcn-geodata)
@@ -85,10 +86,27 @@ CIUDADES = {
         'carpeta': os.path.join('public', 'images', 'casos'),
         'nombres': {},
     },
+    # Códigos postales de un municipio, desde la carpeta local "Mapas ciudades" (un polígono por código postal)
+    'fuenlabrada-cp': {
+        'archivo': os.path.join('Mapas ciudades', 'geojson', 'MADRID.geojson'),
+        'formato': 'geojson',
+        'filtro': ('CODIGO_INE', 28058),
+        'campo_nombre': 'COD_POSTAL',
+        'campo_orden': 'COD_POSTAL',
+        'prefijo_id': 'cp-',
+        'tamano': 300.0,
+        'rendija': 1.2,
+        'aria': 'Códigos postales de Fuenlabrada',
+        'carpeta': os.path.join('public', 'images', 'casos'),
+        'nombres': {},
+    },
 }
 
 
 def descargar(ciudad, cfg):
+    if 'archivo' in cfg:
+        with open(os.path.join(RAIZ, cfg['archivo']), encoding='utf-8') as f:
+            return json.load(f)
     cache = os.path.join(RAIZ, '.cache-mapas')
     os.makedirs(cache, exist_ok=True)
     destino = os.path.join(cache, f'{ciudad}.json')
@@ -142,6 +160,8 @@ def distritos_topojson(data, cfg):
 def distritos_geojson(data, cfg):
     salida = []
     for f in data['features']:
+        if 'filtro' in cfg and f['properties'].get(cfg['filtro'][0]) != cfg['filtro'][1]:
+            continue
         geom = f['geometry']
         poligonos = [geom['coordinates']] if geom['type'] == 'Polygon' else geom['coordinates']
         partes = [([(c[0], c[1]) for c in p[0]], [[(c[0], c[1]) for c in r] for r in p[1:]]) for p in poligonos]
@@ -159,6 +179,15 @@ def generar(ciudad, rendija=None, simplificar=0.25, salida=None):
     print(f'{ciudad}:')
     data = descargar(ciudad, cfg)
     crudos = distritos_topojson(data, cfg) if cfg['formato'] == 'topojson' else distritos_geojson(data, cfg)
+
+    # Si varios polígonos comparten nombre (p. ej. un código postal en dos trozos), se unen en una sola pieza
+    unidos = {}
+    for nombre, orden, partes in crudos:
+        if nombre in unidos:
+            unidos[nombre][2].extend(partes)
+        else:
+            unidos[nombre] = (nombre, orden, list(partes))
+    crudos = list(unidos.values())
 
     todos = [c for _, _, partes in crudos for ext, huecos in partes for c in ext]
     lat0 = sum(p[1] for p in todos) / len(todos)
@@ -208,7 +237,7 @@ def generar(ciudad, rendija=None, simplificar=0.25, salida=None):
               '  <g id="distritos">']
     for nombre, _, geom in piezas:
         q = geom.buffer(-rendija / 2, quad_segs=3, join_style='round').simplify(simplificar)
-        lineas.append(f'    <path id="{slug(nombre)}" class="distrito" data-nombre="{nombre}" d="{d_de(q)}"/>')
+        lineas.append(f'    <path id="{cfg.get("prefijo_id", "")}{slug(nombre)}" class="distrito" data-nombre="{nombre}" d="{d_de(q)}"/>')
     lineas += ['  </g>', '</svg>']
 
     carpeta = salida or os.path.join(RAIZ, cfg.get('carpeta', os.path.join('public', 'images', 'hero')))

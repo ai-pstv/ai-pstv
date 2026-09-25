@@ -217,13 +217,14 @@ body[data-theme='dark'] .case-term { --t-bg: linear-gradient(160deg, #2b2526, #0
 .case-term .case-term__kpi strong { font-size: 2.5rem; font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
 .case-term__kpi small { margin-top: 4px; color: var(--t-muted); font-size: .78rem; }
 .case-term__map svg { width: auto; max-width: 100%; height: 100%; overflow: visible; }
-.case-term__map .distrito { fill: #cb7721; fill-opacity: .16; stroke: #cb7721; stroke-opacity: .45; stroke-width: 1.5; animation: case-term-fill 3.6s ease-in-out infinite; }
+.case-term__map .distrito { fill: var(--t-text); fill-opacity: .06; stroke: var(--t-text); stroke-opacity: .22; stroke-width: 1; }
+.case-term__map .distrito.is-active { fill: #cb7721; fill-opacity: .16; stroke: #cb7721; stroke-opacity: .45; stroke-width: 1.5; animation: case-term-fill 3.6s ease-in-out infinite; }
 .case-term__map .traza { fill: none; stroke: var(--t-glow); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 22 78; filter: drop-shadow(0 0 4px var(--t-glow)); animation: case-term-trace 3.6s linear infinite; }
 @keyframes case-term-trace { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
 @keyframes case-term-fill { 50% { fill-opacity: .3; } }
-@media (prefers-reduced-motion: reduce) { .case-term__map .distrito, .case-term__map .traza { animation: none; } .case-term__map .traza { stroke-dasharray: none; stroke-opacity: .8; } }
+@media (prefers-reduced-motion: reduce) { .case-term__map .distrito.is-active, .case-term__map .traza { animation: none; } .case-term__map .traza { stroke-dasharray: none; stroke-opacity: .8; } }
 .case-term ul { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
-.case-term li { display: grid; grid-template-columns: auto 5.6rem 1fr; gap: 8px; font-size: .78rem; line-height: 1.45; }
+.case-term li { display: grid; grid-template-columns: auto 6.6rem 1fr; gap: 8px; font-size: .78rem; line-height: 1.45; }
 .case-term .prompt { color: #cb7721; font-weight: 700; }
 .case-term .key { color: var(--t-muted); }
 .case-term .msg { color: var(--t-text); }

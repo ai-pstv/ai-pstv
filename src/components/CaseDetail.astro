@@ -19,12 +19,25 @@ const { caso, locale = 'es' } = Astro.props;
 const c = { ...caso.data, ...(locale !== 'es' ? caso.data.traducciones?.[locale] ?? {} : {}) };
 
 const ui = {
-  es: { badge: 'Caso de éxito', back: '← Volver a casos de éxito', imageTag: 'Creatividad emitida', imageAlt: (t: string) => `Creatividad de ${t} emitida en los canales de Atresmedia`, placeholder: 'Fotograma real de la creatividad emitida, pendiente de sustituir por la captura del anuncio.', dataTitle: 'Datos de la campaña', termLabel: 'Datos del caso', termBar: 'caso', location: 'ubicación', product: 'producto', result: 'resultado', coverage: 'Zona de cobertura', coverageCampaign: 'Zona de cobertura de la campaña', cta: 'Quiero un caso como este', titleSuffix: 'Caso de éxito' },
-  en: { badge: 'Success story', back: '← Back to success stories', imageTag: 'Broadcast creative', imageAlt: (t: string) => `${t} creative aired on Atresmedia channels`, placeholder: 'Real frame of the broadcast creative, to be replaced with the ad capture.', dataTitle: 'Campaign data', termLabel: 'Case data', termBar: 'case', location: 'location', product: 'product', result: 'result', coverage: 'Coverage area', coverageCampaign: 'Campaign coverage area', cta: 'I want a case like this', titleSuffix: 'Success story' },
-  ca: { badge: 'Cas d’èxit', back: '← Tornar als casos d’èxit', imageTag: 'Creativitat emesa', imageAlt: (t: string) => `Creativitat de ${t} emesa als canals d’Atresmedia`, placeholder: 'Fotograma real de la creativitat emesa, pendent de substituir per la captura de l’anunci.', dataTitle: 'Dades de la campanya', termLabel: 'Dades del cas', termBar: 'cas', location: 'ubicació', product: 'producte', result: 'resultat', coverage: 'Zona de cobertura', coverageCampaign: 'Zona de cobertura de la campanya', cta: 'Vull un cas com aquest', titleSuffix: 'Cas d’èxit' },
+  es: { badge: 'Caso de éxito', back: '← Volver a casos de éxito', imageTag: 'Creatividad emitida', imageAlt: (t: string) => `Creatividad de ${t} emitida en los canales de Atresmedia`, placeholder: 'Fotograma real de la creatividad emitida, pendiente de sustituir por la captura del anuncio.', dataTitle: 'Datos de la campaña', termLabel: 'Datos del caso', termBar: 'caso', location: 'ubicación', product: 'producto', result: 'resultado', postalCodes: 'cód. postales', coverage: 'Zona de cobertura', coverageCampaign: 'Zona de cobertura de la campaña', cta: 'Quiero un caso como este', titleSuffix: 'Caso de éxito' },
+  en: { badge: 'Success story', back: '← Back to success stories', imageTag: 'Broadcast creative', imageAlt: (t: string) => `${t} creative aired on Atresmedia channels`, placeholder: 'Real frame of the broadcast creative, to be replaced with the ad capture.', dataTitle: 'Campaign data', termLabel: 'Case data', termBar: 'case', location: 'location', product: 'product', result: 'result', postalCodes: 'postcodes', coverage: 'Coverage area', coverageCampaign: 'Campaign coverage area', cta: 'I want a case like this', titleSuffix: 'Success story' },
+  ca: { badge: 'Cas d’èxit', back: '← Tornar als casos d’èxit', imageTag: 'Creativitat emesa', imageAlt: (t: string) => `Creativitat de ${t} emesa als canals d’Atresmedia`, placeholder: 'Fotograma real de la creativitat emesa, pendent de substituir per la captura de l’anunci.', dataTitle: 'Dades de la campanya', termLabel: 'Dades del cas', termBar: 'cas', location: 'ubicació', product: 'producte', result: 'resultat', postalCodes: 'codis postals', coverage: 'Zona de cobertura', coverageCampaign: 'Zona de cobertura de la campanya', cta: 'Vull un cas com aquest', titleSuffix: 'Cas d’èxit' },
 }[locale];
 // Mapa SVG del municipio (public/images/casos/mapa-<nombre>.svg, ver scripts/generar-mapas.py): se incrusta en el HTML y evita cargar Leaflet.
-const mapaSvg = c.mapa ? readFileSync(join(process.cwd(), 'public', 'images', 'casos', `mapa-${c.mapa}.svg`), 'utf-8').replace(/<\?xml[^>]*\?>\s*/, '').replace(/(<path [^>]*?)class="distrito"([^>]*?)\/>/g, '$1class="distrito"$2/>$1class="traza" pathLength="100"$2/>') : '';
+// Con `codigosPostales` en el caso se usa el mapa por códigos postales (mapa-<nombre>-cp.svg) y solo se ilumina lo indicado; sin él, se ilumina el municipio entero.
+const cps: string[] = c.codigosPostales ?? [];
+const svgName = c.mapa ? (cps.length ? `mapa-${c.mapa}-cp.svg` : `mapa-${c.mapa}.svg`) : '';
+const mapaSvg = c.mapa
+  ? readFileSync(join(process.cwd(), 'public', 'images', 'casos', svgName), 'utf-8')
+      .replace(/<\?xml[^>]*\?>\s*/, '')
+      .replace(/<path ([^>]*?)class="distrito"([^>]*?)\/>/g, (_m: string, a: string, b: string) => {
+        const id = /id="cp-(\d+)"/.exec(a + b)?.[1];
+        const active = !cps.length || (id !== undefined && cps.includes(id));
+        return active
+          ? `<path ${a}class="distrito is-active"${b}/><path ${a}class="traza" pathLength="100"${b}/>`
+          : `<path ${a}class="distrito"${b}/>`;
+      })
+  : '';
 const useLeaflet = !c.mapa && c.lat && c.lng;
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -98,6 +111,7 @@ const homePrefix = locale === 'es' ? '' : `/${locale}`;
               )}
               <ul>
                 <li><span class="prompt">&gt;</span><span class="key">{ui.location}</span><span class="msg" data-type>{c.ubicacion}</span></li>
+                {cps.length > 0 && <li><span class="prompt">&gt;</span><span class="key">{ui.postalCodes}</span><span class="msg" data-type>{cps.join(', ')}</span></li>}
                 <li><span class="prompt">&gt;</span><span class="key">{ui.product}</span><span class="msg" data-type>{c.producto}</span></li>
                 <li class="case-term__result"><span class="prompt">&gt;</span><span class="key">{ui.result}</span><span class="msg" data-type><strong>{resultadoTexto}</strong> {c.resultadoDescripcion}</span></li>
               </ul>
