@@ -211,15 +211,21 @@ body[data-theme='dark'] .case-term { --t-bg: linear-gradient(160deg, #2b2526, #0
 .case-term__bar i { width: 8px; height: 8px; border-radius: 50%; background: var(--t-dot); }
 .case-term__bar i:first-child { background: #cb7721; }
 .case-term__bar span { margin-left: auto; color: var(--t-muted); font-size: .62rem; letter-spacing: .06em; text-transform: uppercase; }
-.case-term__map { position: relative; display: flex; justify-content: center; height: 190px; margin-bottom: 16px; padding: 6px 0 10px; border-bottom: 1px solid var(--t-border); }
-.case-term__place { position: absolute; top: 2px; left: 0; color: var(--t-text); font-size: .95rem; font-weight: 700; letter-spacing: -.01em; }
+.case-term__map { position: relative; overflow: hidden; display: flex; justify-content: center; aspect-ratio: 2 / 1; min-height: 150px; max-height: 300px; margin-bottom: 16px; padding: 0 0 10px; border-bottom: 1px solid var(--t-border); }
+.case-term__place { position: absolute; top: 2px; left: 0; z-index: 1; max-width: 48%; line-height: 1.15; color: var(--t-text); font-size: .95rem; font-weight: 700; letter-spacing: -.01em; }
 .case-term__kpi { position: absolute; top: 0; right: 0; display: flex; flex-direction: column; align-items: flex-end; line-height: 1.05; }
 .case-term .case-term__kpi strong { font-size: 2.5rem; font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
 .case-term__kpi small { margin-top: 4px; color: var(--t-muted); font-size: .78rem; }
-.case-term__map svg { width: auto; max-width: 100%; height: 100%; overflow: visible; }
-.case-term__map .distrito { fill: var(--t-text); fill-opacity: .06; stroke: var(--t-text); stroke-opacity: .22; stroke-width: 1; }
-.case-term__map .distrito.is-active { fill: #cb7721; fill-opacity: .16; stroke: #cb7721; stroke-opacity: .45; stroke-width: 1.5; animation: case-term-fill 3.6s ease-in-out infinite; }
-.case-term__map .traza { fill: none; stroke: var(--t-glow); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 22 78; filter: drop-shadow(0 0 4px var(--t-glow)); animation: case-term-trace 3.6s linear infinite; }
+.case-term__map svg { width: 100%; height: 100%; overflow: hidden; }
+.case-term__map .cp-tag rect { fill: #cb7721; stroke: var(--t-bg-solid, #fff); stroke-width: .8px; vector-effect: non-scaling-stroke; }
+.case-term__map .cp-tag text { fill: #fff; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 700; }
+.case-term__map .cp-tag { opacity: 0; animation: cp-tag-in .4s ease forwards; }
+@keyframes cp-tag-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .case-term__map .cp-tag { opacity: 1; animation: none; } }
+.case-term__map path { vector-effect: non-scaling-stroke; }
+.case-term__map .distrito { fill: var(--t-text); fill-opacity: .06; stroke: var(--t-text); stroke-opacity: .2; stroke-width: .8px; }
+.case-term__map .distrito.is-active { fill: #cb7721; fill-opacity: .16; stroke: #cb7721; stroke-opacity: .5; stroke-width: 1px; animation: case-term-fill 3.6s ease-in-out infinite; }
+.case-term__map .traza { fill: none; stroke: var(--t-glow); stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 22 78; filter: drop-shadow(0 0 3px var(--t-glow)); animation: case-term-trace 3.6s linear infinite; }
 @keyframes case-term-trace { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
 @keyframes case-term-fill { 50% { fill-opacity: .3; } }
 @media (prefers-reduced-motion: reduce) { .case-term__map .distrito.is-active, .case-term__map .traza { animation: none; } .case-term__map .traza { stroke-dasharray: none; stroke-opacity: .8; } }

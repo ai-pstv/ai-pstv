@@ -100,6 +100,20 @@ CIUDADES = {
         'carpeta': os.path.join('public', 'images', 'casos'),
         'nombres': {},
     },
+    # Códigos postales de Madrid capital, desde la carpeta local "Mapas ciudades"
+    'madrid-cp': {
+        'archivo': os.path.join('Mapas ciudades', 'geojson', 'MADRID.geojson'),
+        'formato': 'geojson',
+        'filtro': ('CODIGO_INE', 28079),
+        'campo_nombre': 'COD_POSTAL',
+        'campo_orden': 'COD_POSTAL',
+        'prefijo_id': 'cp-',
+        'tamano': 900.0,
+        'rendija': 1.2,
+        'aria': 'Códigos postales de Madrid',
+        'carpeta': os.path.join('public', 'images', 'casos'),
+        'nombres': {},
+    },
 }
 
 
