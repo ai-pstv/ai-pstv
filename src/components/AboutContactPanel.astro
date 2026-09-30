@@ -1,0 +1,76 @@
+---
+// Tarjeta del hero de "Quiénes somos": qué supone trabajar con +Cerca Media (no repite el mapa/segmentación, ya explicado en la home).
+// Reutiliza el lenguaje visual de tarjeta oscura del resto de la web (case-term, flow-panel). Anima al hacer scroll.
+// Las cifras reutilizan las ya publicadas en la home (sección "El poder de Atresmedia"), no son nuevas.
+const stats = [
+  { value: '27M', label: 'Audiencia' },
+  { value: 'Nº1 TV', label: 'Autoridad' },
+];
+
+const items = [
+  {
+    icon: '<circle cx="9" cy="8" r="3.2"/><path d="M2.8 19a6.2 6.2 0 0 1 12.4 0"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.5 13.2a5 5 0 0 1 5.7 5.8"/>',
+    title: 'Un único punto de contacto',
+    text: 'Durante toda la campaña, de principio a fin.',
+  },
+  {
+    icon: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+    title: 'Propuesta a tu medida',
+    text: 'Zona, objetivo y presupuesto, antes de activar nada.',
+  },
+  {
+    icon: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+    title: 'Activación en 72 h',
+    text: 'Desde que confirmas la campaña hasta que se emite.',
+  },
+];
+---
+<div class="about-panel" data-about-panel aria-hidden="true">
+  <div class="about-panel__bar"><i></i><i></i><i></i><span>+Cerca Media</span></div>
+  <div class="about-panel__stats">
+    {stats.map((s) => (<div class="about-panel__stat"><strong>{s.value}</strong><span>{s.label}</span></div>))}
+  </div>
+  <ul class="about-panel__list">
+    {items.map((item) => (
+      <li>
+        <span class="about-panel__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={item.icon} /></span>
+        <span class="about-panel__copy"><strong>{item.title}</strong><span>{item.text}</span></span>
+      </li>
+    ))}
+  </ul>
+  <a class="about-panel__contact" href="mailto:hola@publicidadsegmentadatv.com">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
+    hola@publicidadsegmentadatv.com
+  </a>
+</div>
+
+<script>
+  const panel = document.querySelector<HTMLElement>('[data-about-panel]');
+  if (panel && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const stats = [...panel.querySelectorAll<HTMLElement>('.about-panel__stat')];
+    const items = [...panel.querySelectorAll<HTMLElement>('.about-panel__list > li')];
+    const contact = panel.querySelector<HTMLElement>('.about-panel__contact')!;
+    panel.classList.add('is-animating');
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting) return;
+      observer.disconnect();
+      stats.forEach((s, i) => setTimeout(() => s.classList.add('is-on'), 120 + i * 160));
+      const itemsStart = 120 + stats.length * 160 + 200;
+      items.forEach((li, i) => setTimeout(() => li.classList.add('is-on'), itemsStart + i * 280));
+      const contactAt = itemsStart + items.length * 280 + 200;
+      setTimeout(() => contact.classList.add('is-on'), contactAt);
+
+      // Flujo continuo: recorre los tres puntos en bucle, como el resto de paneles animados de la web.
+      setTimeout(() => {
+        let i = 0;
+        setInterval(() => {
+          items[i].classList.remove('is-active');
+          i = (i + 1) % items.length;
+          items[i].classList.add('is-active');
+        }, 2200);
+        items[0].classList.add('is-active');
+      }, contactAt + 600);
+    }, { threshold: 0.4 });
+    observer.observe(panel);
+  }
+</script>

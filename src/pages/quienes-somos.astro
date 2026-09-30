@@ -1,0 +1,109 @@
+---
+// Contenido según docs/MAPA-CONTENIDOS.md (sección 2. QUIÉNES SOMOS): solo identidad (quién está detrás, a quién
+// ayuda, contacto). El "cómo funciona" (segmentación por zona, sexo/edad/renta/intereses, HbbTV, creatividades…)
+// es contenido de la futura página de Soluciones (sección 5 del mapa) y no se repite aquí para no duplicar.
+// Tampoco se repiten aquí los 5 pasos del proceso: ya los tiene la home (sección .process de index.astro).
+// Relación +CercaTV / +Cerca Media / Atresmedia Publicidad confirmada por el usuario (no por MAPA-CONTENIDOS,
+// que seguía marcándola como pendiente): +CercaTV es un proyecto de Atresmedia Publicidad, comercializado en
+// exclusiva por +Cerca Media.
+// Sigue pendiente de confirmar: fecha de fundación, equipo, datos corporativos.
+import '../styles/global.css';
+import '../styles/tokens.css';
+import '../styles/header.css';
+import '../styles/footer.css';
+import Header from '../components/Header.astro';
+import AuthGate from '../components/AuthGate.astro';
+import Footer from '../components/Footer.astro';
+import AboutContactPanel from '../components/AboutContactPanel.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const siteOrigin = 'https://publicidadsegmentadatv.com';
+const pageUrl = `${siteOrigin}${base}/quienes-somos/`;
+
+const pinIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>';
+const tvIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 3l4 3 4-3"/></svg>';
+const usersIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 19a6.2 6.2 0 0 1 12.4 0"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.5 13.2a5 5 0 0 1 5.7 5.8"/></svg>';
+
+const sectors = [
+  { title: 'Con una zona de influencia concreta', text: 'Concesionarios, clínicas, franquicias, retail y hostelería: negocios cuyo cliente vive, trabaja o pasa por una zona determinada.' },
+  { title: 'Sin presupuesto para TV nacional', text: 'Negocios que hasta ahora no podían plantearse la televisión porque la emisión nacional no compensaba frente a su zona real de venta.' },
+  { title: 'Con varias sedes o delegaciones', text: 'Redes y franquicias que necesitan anunciarse solo en la zona de cobertura de cada centro, no en todo el país a la vez.' },
+];
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: '+CercaTV',
+  url: `${siteOrigin}${base}/`,
+  logo: `${siteOrigin}${base}/images/brand/cercatv-logo-color.svg`,
+  description: 'Publicidad en televisión hiperlocal a través de los canales de Atresmedia. Un proyecto de Atresmedia Publicidad comercializado en exclusiva por +Cerca Media, segmentado por código postal, barrio o ciudad.',
+};
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <AuthGate />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="Quiénes somos: +CercaTV es un proyecto de Atresmedia Publicidad, comercializado en exclusiva por +Cerca Media, pensado para negocios con una zona de influencia concreta." />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="preload" href={`${base}/fonts/gothampro-regular.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={`${base}/fonts/gothampro-bold.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="canonical" href={pageUrl} />
+    <title>Quiénes somos | +CercaTV</title>
+    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+  </head>
+  <body class="page-wide hero-flow-test">
+    <Header locale="es" />
+    <main>
+      <section class="hero">
+        <div class="hero__content">
+          <span class="eyebrow">Quiénes somos</span>
+          <h1>Televisión para negocios con una zona concreta, no para todo el país</h1>
+          <p>+CercaTV es un proyecto de Atresmedia Publicidad, comercializado en exclusiva por +Cerca Media, tu único punto de contacto durante toda la campaña.</p>
+          <div class="hero__actions">
+            <a class="hero__primary-action" href={`${base}/#contact`}>Estudiar mi campaña</a>
+            <a class="hero__secondary-action" href="#a-quien-ayudamos">A quién ayudamos <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <AboutContactPanel />
+      </section>
+
+      <section class="benefits" id="a-quien-ayudamos" aria-labelledby="about-sectores-title" data-reveal>
+        <h2 id="about-sectores-title">A quién ayudamos</h2>
+        <div class="benefits__grid">
+          {sectors.map((s, i) => (
+            <article class="benefit">
+              <div class="benefit__icon" aria-hidden="true" set:html={[pinIcon, tvIcon, usersIcon][i]} />
+              <h3>{s.title}</h3>
+              <p>{s.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="decision-strip" id="hablamos" data-reveal>
+        <div class="decision-strip__inner">
+          <span class="eyebrow">Hablamos</span>
+          <h2>Cuéntanos tu negocio y estudiamos si la televisión hiperlocal tiene sentido para ti</h2>
+          <a class="cta-pill" href={`${base}/#contact`}><span class="cta-pill__full">Estudiar mi campaña, sin compromiso</span><span class="cta-pill__short">Estudiar mi campaña</span></a>
+        </div>
+      </section>
+    </main>
+
+    <Footer locale="es" />
+
+    <script>
+      const modules = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        modules.forEach((module) => module.classList.add('is-ready'));
+        const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+          if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
+        }), { threshold: 0.12 });
+        modules.forEach((module) => observer.observe(module));
+      }
+    </script>
+  </body>
+</html>
